@@ -1,6 +1,6 @@
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open('videoprivee-v3').then(cache => {
+    caches.open('videoprivee-final').then(cache => {
       return cache.addAll([
         './index.html',
         './icon-192.png',

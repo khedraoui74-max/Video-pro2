@@ -63,18 +63,22 @@
     }
     /* Menu latéral */
     .menu-btn {
-      position: absolute;
+      position: fixed;
       top: 1rem;
       right: 1rem;
-      background: rgba(124,92,255,0.2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      font-size: 1.4rem;
+      background: var(--accent);
+      border: none;
+      color: white;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      font-size: 1.6rem;
       cursor: pointer;
-      z-index: 100;
+      z-index: 300;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .sidebar {
       position: fixed;
@@ -340,23 +344,78 @@
     </div>
   </div>
 
-  <div class="container hidden" id="mainApp">
-    <button class="menu-btn" id="menuBtn">☰</button>
-    <div class="overlay" id="overlay"></div>
-    <div class="sidebar" id="sidebar">
-      <h3>Menu</h3>
-      <button id="toggleTheme">Mode jour / nuit</button>
-      <label style="display:block;margin:1rem 0 0.3rem;font-size:0.9rem;">Langue</label>
-      <select id="langSelect">
-        <option value="fr">Français</option>
-        <option value="en">English</option>
-        <option value="ar">العربية (فلسطينية)</option>
-      </select>
-      <button id="managePassword">Changer le mot de passe</button>
-      <button id="manageProfiles">Gérer les profils</button>
-      <button id="closeMenu" style="margin-top:2rem;background:var(--accent);">Fermer</button>
-    </div>
+  <!-- Menu toujours disponible -->
+  <button class="menu-btn hidden" id="menuBtn">☰</button>
+  <div class="overlay" id="overlay"></div>
+  <div class="sidebar" id="sidebar">
+    <h3>Menu</h3>
+    <button id="toggleTheme">Mode jour / nuit</button>
+    <label style="display:block;margin:1rem 0 0.3rem;font-size:0.9rem;">Langue</label>
+    <select id="langSelect">
+      <option value="fr">Français</option>
+      <option value="en">English</option>
+      <option value="ar">العربية (فلسطينية)</option>
+    </select>
+    <button id="managePassword">Changer le mot de passe</button>
+    <button id="manageProfiles">Gérer les profils</button>
+    <button id="showHelp">Comment utiliser l’application</button>
+    <button id="closeMenu" style="margin-top:2rem;background:var(--accent);">Fermer</button>
+  </div>
 
+  <!-- Aide complète -->
+  <div id="helpModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:400;display:flex;align-items:center;justify-content:center;padding:1rem;">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:700px;width:100%;max-height:85vh;overflow-y:auto;padding:1.5rem;position:relative;">
+      <button id="closeHelp" style="position:absolute;top:0.8rem;right:0.8rem;background:none;border:none;color:var(--text);font-size:1.5rem;cursor:pointer;">✕</button>
+      <h2 style="margin-top:0;">Comment utiliser VidéoPrivée</h2>
+      <div style="line-height:1.6;color:var(--text);font-size:0.95rem;">
+        <h3>1. Première ouverture</h3>
+        <p>Ouvre le site ou l’application. Tu arrives sur l’écran de connexion.</p>
+
+        <h3>2. Connexion ou création de compte</h3>
+        <ul>
+          <li><strong>Nouveau</strong> : « Créer un compte » → e-mail + mot de passe (min. 4 caractères).</li>
+          <li><strong>Déjà un compte</strong> : entre e-mail + mot de passe → « Se connecter ».</li>
+          <li><strong>Mot de passe oublié</strong> : clique sur le lien → e-mail + nouveau mot de passe.</li>
+          <li><strong>Accès rapide</strong> : laisse l’e-mail vide et entre un code maître (<code>hessus</code>, <code>hessuusssss</code>, <code>master</code>, <code>prive</code> ou <code>video123</code>).</li>
+        </ul>
+        <p>Tout est stocké uniquement dans ton navigateur.</p>
+
+        <h3>3. Une fois connecté</h3>
+        <p>Tu vois le logo, la citation du jour, le bouton ☰, la zone de dépôt de vidéo et la section d’extraction de lien.</p>
+
+        <h3>4. Envoyer une vidéo</h3>
+        <ol>
+          <li>Glisse-dépose ta vidéo ou clique pour en choisir une (tous formats acceptés).</li>
+          <li>Aperçu + informations (durée, taille…).</li>
+          <li>Tu peux télécharger, renommer, copier un lien privé temporaire, partager manuellement ou retirer la vidéo.</li>
+        </ol>
+
+        <h3>5. Partager sur les plateformes</h3>
+        <p>Après avoir chargé une vidéo, clique sur une plateforme (TikTok, Instagram, YouTube, etc.). L’application ouvre le site. Tu envoies ta vidéo manuellement (rien n’est envoyé automatiquement pour rester 100 % privé).</p>
+
+        <h3>6. Extraire depuis un lien</h3>
+        <p>Colle un lien public → « Préparer le lien ». Ouvre-le manuellement, télécharge la vidéo, puis reviens pour la partager.</p>
+
+        <h3>7. Menu ☰</h3>
+        <ul>
+          <li>Mode jour / nuit</li>
+          <li>Langue (Français, English, العربية)</li>
+          <li>Gestion du mot de passe et des profils</li>
+          <li>Cette aide</li>
+        </ul>
+
+        <h3>8. Installation</h3>
+        <p>Sur le site web, une carte « Installer l’application » apparaît. Sur Chrome Android : menu ⋮ → « Ajouter à l’écran d’accueil ». Elle disparaît une fois l’application installée.</p>
+
+        <h3>Panneau Administrateur</h3>
+        <p>Visible uniquement avec l’e-mail <code>drive.ia01@outlook.com</code> + un code maître. Permet de voir/supprimer les comptes et de réinitialiser toutes les données locales.</p>
+
+        <p style="margin-top:1.5rem;color:var(--muted);"><strong>100 % privé · Gratuit · Illimité · Fonctionne hors ligne</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container hidden" id="mainApp">
     <header>
       <img src="icon-512.png" alt="Logo VidéoPrivée">
       <h1>VidéoPrivée</h1>
@@ -520,6 +579,8 @@
     function unlockApp(isAdmin = false) {
       loginScreen.classList.add('hidden');
       mainApp.classList.remove('hidden');
+      document.getElementById('menuBtn').classList.remove('hidden');
+      if (typeof initMenu === 'function') initMenu();
       showDailyQuote();
       showPlatformQuote();
       if (isAdmin) {
@@ -937,33 +998,58 @@
 
     // === Nouvelles fonctionnalités ===
 
-    // Menu latéral
-    const menuBtn = document.getElementById('menuBtn');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    const closeMenu = document.getElementById('closeMenu');
+    // Menu latéral (robuste)
+    function initMenu() {
+      const menuBtn = document.getElementById('menuBtn');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      const closeMenu = document.getElementById('closeMenu');
+      if (!menuBtn || !sidebar) return;
 
-    function openSidebar() {
-      sidebar.classList.add('open');
-      overlay.classList.add('show');
-    }
-    function closeSidebar() {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('show');
-    }
-    menuBtn.onclick = openSidebar;
-    closeMenu.onclick = closeSidebar;
-    overlay.onclick = closeSidebar;
+      function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('show');
+      }
+      function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+      menuBtn.addEventListener('click', openSidebar);
+      if (closeMenu) closeMenu.addEventListener('click', closeSidebar);
+      if (overlay) overlay.addEventListener('click', closeSidebar);
 
-    // Mode jour / nuit
-    const toggleThemeBtn = document.getElementById('toggleTheme');
-    toggleThemeBtn.onclick = () => {
-      document.body.classList.toggle('light');
-      localStorage.setItem('videoprivee_theme', document.body.classList.contains('light') ? 'light' : 'dark');
-    };
-    if (localStorage.getItem('videoprivee_theme') === 'light') {
-      document.body.classList.add('light');
+      // Theme
+      const toggleThemeBtn = document.getElementById('toggleTheme');
+      if (toggleThemeBtn) {
+        toggleThemeBtn.addEventListener('click', () => {
+          document.body.classList.toggle('light');
+          localStorage.setItem('videoprivee_theme', document.body.classList.contains('light') ? 'light' : 'dark');
+        });
+      }
+      if (localStorage.getItem('videoprivee_theme') === 'light') {
+        document.body.classList.add('light');
+      }
+
+      // Aide
+      const helpModal = document.getElementById('helpModal');
+      const showHelp = document.getElementById('showHelp');
+      const closeHelp = document.getElementById('closeHelp');
+      if (showHelp && helpModal) {
+        showHelp.addEventListener('click', () => {
+          helpModal.classList.remove('hidden');
+          closeSidebar();
+        });
+      }
+      if (closeHelp) closeHelp.addEventListener('click', () => helpModal.classList.add('hidden'));
+      if (helpModal) {
+        helpModal.addEventListener('click', (e) => {
+          if (e.target === helpModal) helpModal.classList.add('hidden');
+        });
+      }
     }
+    initMenu();
+    // Sécurité : re-initialiser après le chargement complet
+    window.addEventListener('load', initMenu);
 
     // Langues simples
     const translations = {
@@ -987,11 +1073,13 @@
     // Gestion mot de passe / profils (simplifié)
     document.getElementById('managePassword').onclick = () => {
       alert('Pour changer le mot de passe, utilise « Mot de passe oublié » sur l’écran de connexion, ou le panneau admin.');
-      closeSidebar();
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay').classList.remove('show');
     };
     document.getElementById('manageProfiles').onclick = () => {
       alert('Les profils se gèrent dans le panneau administrateur (visible avec un code maître).');
-      closeSidebar();
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay').classList.remove('show');
     };
 
     // Installation : cacher en mode standalone
@@ -1025,6 +1113,11 @@
     };
 
     window.addEventListener('beforeunload', () => { if (objectUrl) URL.revokeObjectURL(objectUrl); });
+
+    // Enregistrement du Service Worker pour le mode hors ligne / PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
   </script>
 </body>
 </html>
