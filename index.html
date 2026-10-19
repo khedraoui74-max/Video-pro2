@@ -1071,6 +1071,17 @@
           if (e.target === helpModal) helpModal.classList.add('hidden');
         });
       }
+
+      // Profils
+      const manageProfiles = document.getElementById('manageProfiles');
+      const profilesModal = document.getElementById('profilesModal');
+      if (manageProfiles && profilesModal) {
+        manageProfiles.addEventListener('click', () => {
+          profilesModal.classList.remove('hidden');
+          if (typeof loadProfilesList === 'function') loadProfilesList();
+          closeSidebar();
+        });
+      }
     }
     initMenu();
     // Sécurité : re-initialiser après le chargement complet
