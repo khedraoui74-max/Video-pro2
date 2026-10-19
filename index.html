@@ -394,33 +394,49 @@
 
         <h3>4. Envoyer une vidéo</h3>
         <ol>
-          <li>Glisse-dépose ta vidéo ou clique pour en choisir une (tous formats acceptés).</li>
-          <li>Aperçu + informations (durée, taille…).</li>
-          <li>Tu peux télécharger, renommer, copier un lien privé temporaire, partager manuellement ou retirer la vidéo.</li>
+          <li>Touche la zone « Glisse-dépose ta vidéo ici » → choisis ton fichier.</li>
+          <li>Un message vert apparaît : « Vidéo chargée localement. Prête à partager. »</li>
+          <li>L’aperçu s’affiche en dessous.</li>
+          <li>Choisis une plateforme pour partager (ouverture manuelle).</li>
         </ol>
 
-        <h3>5. Partager sur les plateformes</h3>
-        <p>Après avoir chargé une vidéo, clique sur une plateforme (TikTok, Instagram, YouTube, etc.). L’application ouvre le site. Tu envoies ta vidéo manuellement (rien n’est envoyé automatiquement pour rester 100 % privé).</p>
+        <h3>5. Gérer les profils</h3>
+        <p>Menu ☰ → « Gérer les profils ». Ajoute un nom de profil pour chaque plateforme (ex. TikTok → « moncompte »). Lors du partage, tu pourras choisir le(s) profil(s).</p>
 
-        <h3>6. Extraire depuis un lien</h3>
-        <p>Colle un lien public → « Préparer le lien ». Ouvre-le manuellement, télécharge la vidéo, puis reviens pour la partager.</p>
+        <h3>6. Partager sur les plateformes</h3>
+        <p>Après avoir chargé une vidéo, clique sur une plateforme. L’application ouvre le site. Tu envoies ta vidéo manuellement.</p>
 
-        <h3>7. Menu ☰</h3>
-        <ul>
-          <li>Mode jour / nuit</li>
-          <li>Langue (Français, English, العربية)</li>
-          <li>Gestion du mot de passe et des profils</li>
-          <li>Cette aide</li>
-        </ul>
-
-        <h3>8. Installation</h3>
-        <p>Sur le site web, une carte « Installer l’application » apparaît. Sur Chrome Android : menu ⋮ → « Ajouter à l’écran d’accueil ». Elle disparaît une fois l’application installée.</p>
-
-        <h3>Panneau Administrateur</h3>
-        <p>Visible uniquement avec l’e-mail <code>drive.ia01@outlook.com</code> + un code maître. Permet de voir/supprimer les comptes et de réinitialiser toutes les données locales.</p>
+        <h3>7. Installation</h3>
+        <p>Sur le site web, une carte « Installer l’application » apparaît. Sur Chrome Android : menu ⋮ → « Ajouter à l’écran d’accueil ».</p>
 
         <p style="margin-top:1.5rem;color:var(--muted);"><strong>100 % privé · Gratuit · Illimité · Fonctionne hors ligne</strong></p>
       </div>
+    </div>
+  </div>
+
+  <!-- Gestion des profils -->
+  <div id="profilesModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:400;display:flex;align-items:center;justify-content:center;padding:1rem;">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:500px;width:100%;padding:1.5rem;position:relative;">
+      <button id="closeProfiles" style="position:absolute;top:0.8rem;right:0.8rem;background:none;border:none;color:var(--text);font-size:1.5rem;cursor:pointer;">✕</button>
+      <h2 style="margin-top:0;">Gérer les profils</h2>
+      <p style="color:var(--muted);font-size:0.9rem;">Ajoute les noms de tes comptes pour chaque plateforme.</p>
+      <label style="display:block;margin:0.8rem 0 0.3rem;">Plateforme</label>
+      <select id="profilePlatform" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;">
+        <option value="TikTok">TikTok</option>
+        <option value="Instagram">Instagram</option>
+        <option value="YouTube">YouTube</option>
+        <option value="Facebook">Facebook</option>
+        <option value="Twitter / X">Twitter / X</option>
+        <option value="Snapchat">Snapchat</option>
+        <option value="WhatsApp">WhatsApp</option>
+        <option value="Telegram">Telegram</option>
+        <option value="Discord">Discord</option>
+        <option value="Reddit">Reddit</option>
+      </select>
+      <label style="display:block;margin:0.8rem 0 0.3rem;">Nom du profil</label>
+      <input type="text" id="profileName" placeholder="ex. moncompte" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;">
+      <button class="btn" id="addProfileBtn" style="width:100%;margin-top:0.8rem;">Ajouter le profil</button>
+      <div id="profilesList" style="margin-top:1rem;font-size:0.9rem;background:rgba(0,0,0,0.2);padding:0.8rem;border-radius:8px;max-height:200px;overflow:auto;"></div>
     </div>
   </div>
 
@@ -829,7 +845,7 @@
         <div class="info-item"><strong>Type</strong>${file.type || 'Inconnu'}</div>
         <div class="info-item"><strong>Format</strong>${file.name.split('.').pop().toUpperCase()}</div>
       `;
-      status.innerHTML = '<span class="success">Vidéo chargée localement. Prête à partager.</span>';
+      status.innerHTML = '<span class="success" style="font-size:1.05rem;font-weight:600;">✅ Vidéo chargée ! Elle est prête à partager.</span>';
       renderPlatforms();
     }
 
@@ -1086,10 +1102,34 @@
       document.getElementById('overlay').classList.remove('show');
     };
     document.getElementById('manageProfiles').onclick = () => {
-      alert('Les profils se gèrent dans le panneau administrateur (visible avec un code maître).');
+      document.getElementById('profilesModal').classList.remove('hidden');
+      loadProfilesList();
       document.getElementById('sidebar').classList.remove('open');
       document.getElementById('overlay').classList.remove('show');
     };
+    document.getElementById('closeProfiles').onclick = () => {
+      document.getElementById('profilesModal').classList.add('hidden');
+    };
+    document.getElementById('addProfileBtn').onclick = () => {
+      const platform = document.getElementById('profilePlatform').value;
+      const name = document.getElementById('profileName').value.trim();
+      if (!name) return alert('Entre un nom de profil');
+      const profiles = getProfiles();
+      if (!profiles[platform]) profiles[platform] = [];
+      if (!profiles[platform].includes(name)) profiles[platform].push(name);
+      saveProfiles(profiles);
+      document.getElementById('profileName').value = '';
+      loadProfilesList();
+    };
+    function loadProfilesList() {
+      const profiles = getProfiles();
+      const div = document.getElementById('profilesList');
+      let html = '';
+      for (const [platform, names] of Object.entries(profiles)) {
+        html += `<div style="margin:0.4rem 0;"><strong>${platform}</strong> : ${names.join(', ')}</div>`;
+      }
+      div.innerHTML = html || '<em>Aucun profil enregistré.</em>';
+    }
 
     // Installation : cacher en mode standalone
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
