@@ -447,6 +447,13 @@
       <p class="subtitle">Envoie des vidéos de tous formats sur plusieurs plateformes<br><strong>Gratuit · Illimité · 100 % privé</strong> <span class="badge">Local</span></p>
       <div class="header-quote" id="headerQuote"></div>
       <div class="header-quote-source" id="headerQuoteSource"></div>
+      <button class="btn" id="mainDownloadBtn" style="margin-top:0.5rem;display:none;">⬇️ Télécharger la vidéo</button>
+      <div id="progressContainer" style="display:none;margin-top:0.8rem;width:100%;max-width:400px;margin-left:auto;margin-right:auto;">
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;height:10px;overflow:hidden;">
+          <div id="progressBar" style="width:0%;height:100%;background:var(--accent);transition:width 0.3s;"></div>
+        </div>
+        <div id="progressText" style="font-size:0.8rem;color:var(--muted);margin-top:0.3rem;">0%</div>
+      </div>
     </header>
 
     <div class="card" id="installCard">
@@ -753,36 +760,18 @@
       localStorage.setItem('videoprivee_profiles', JSON.stringify(profiles));
     }
 
-    function loadProfiles() {
+    function loadProfilesList() {
       const profiles = getProfiles();
       const div = document.getElementById('profilesList');
+      if (!div) return;
       let html = '';
       for (const [platform, names] of Object.entries(profiles)) {
         if (names && names.length) {
-          html += `<strong>${platform}</strong><br>` + names.map(n => `• ${n}`).join('<br>') + '<br><br>';
+          html += `<div style="margin:0.4rem 0;"><strong>${platform}</strong> : ${names.join(', ')}</div>`;
         }
       }
       div.innerHTML = html || '<em>Aucun profil enregistré.</em>';
     }
-
-    document.getElementById('addProfile').onclick = () => {
-      const platform = document.getElementById('profilePlatform').value;
-      const name = document.getElementById('profileName').value.trim();
-      if (!name) return alert('Entre un nom de profil');
-      const profiles = getProfiles();
-      if (!profiles[platform]) profiles[platform] = [];
-      if (!profiles[platform].includes(name)) profiles[platform].push(name);
-      saveProfiles(profiles);
-      document.getElementById('profileName').value = '';
-      loadProfiles();
-    };
-
-    // Appeler loadProfiles quand le panneau admin s'ouvre
-    const originalLoadAdmin = loadAdminData;
-    loadAdminData = function() {
-      originalLoadAdmin();
-      loadProfiles();
-    };
 
     // Reste de l'app (upload & partage)
     const dropzone = document.getElementById('dropzone');
@@ -831,6 +820,30 @@
         status.innerHTML = '<span style="color:#f87171">Veuillez sélectionner un fichier vidéo.</span>';
         return;
       }
+
+      const progressContainer = document.getElementById('progressContainer');
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+      progressContainer.style.display = 'block';
+      progressBar.style.width = '0%';
+      progressText.textContent = 'Chargement...';
+
+      // Simulation de progression
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.random() * 15 + 5;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          progressBar.style.width = '100%';
+          progressText.textContent = 'Terminé';
+          setTimeout(() => { progressContainer.style.display = 'none'; }, 800);
+        } else {
+          progressBar.style.width = progress + '%';
+          progressText.textContent = Math.round(progress) + '%';
+        }
+      }, 120);
+
       currentFile = file;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
       objectUrl = URL.createObjectURL(file);
@@ -846,6 +859,7 @@
         <div class="info-item"><strong>Format</strong>${file.name.split('.').pop().toUpperCase()}</div>
       `;
       status.innerHTML = '<span class="success" style="font-size:1.05rem;font-weight:600;">✅ Vidéo chargée ! Elle est prête à partager.</span>';
+      document.getElementById('mainDownloadBtn').style.display = 'inline-block';
       renderPlatforms();
     }
 
@@ -1010,6 +1024,16 @@
       a.click();
       status.innerHTML = '<span class="success">Téléchargement lancé.</span>';
     };
+    const mainDownloadBtn = document.getElementById('mainDownloadBtn');
+    if (mainDownloadBtn) {
+      mainDownloadBtn.onclick = () => {
+        if (!currentFile) return alert('Charge d’abord une vidéo.');
+        const a = document.createElement('a');
+        a.href = objectUrl;
+        a.download = currentFile.name;
+        a.click();
+      };
+    }
 
     copyLinkBtn.onclick = async () => {
       if (!objectUrl) return;
@@ -1082,65 +1106,51 @@
           closeSidebar();
         });
       }
+
+      // Langue
+      const langSelect = document.getElementById('langSelect');
+      if (langSelect) {
+        langSelect.addEventListener('change', (e) => {
+          const lang = e.target.value;
+          const translations = {
+            fr: { title: 'VidéoPrivée', sub: 'Envoie des vidéos de tous formats sur plusieurs plateformes' },
+            en: { title: 'VideoPrivate', sub: 'Send videos of all formats to multiple platforms' },
+            ar: { title: 'فيديو خاص', sub: 'أرسل فيديوهات بجميع الصيغ إلى عدة منصات' }
+          };
+          const t = translations[lang] || translations.fr;
+          const h1 = document.querySelector('h1');
+          const sub = document.querySelector('.subtitle');
+          if (h1) h1.textContent = t.title;
+          if (sub) sub.innerHTML = t.sub + '<br><strong>Gratuit · Illimité · 100 % privé</strong> <span class="badge">Local</span>';
+          localStorage.setItem('videoprivee_lang', lang);
+        });
+        const savedLang = localStorage.getItem('videoprivee_lang');
+        if (savedLang) langSelect.value = savedLang;
+      }
+
+      // Ajout de profil
+      const addProfileBtn = document.getElementById('addProfileBtn');
+      if (addProfileBtn) {
+        addProfileBtn.addEventListener('click', () => {
+          const platform = document.getElementById('profilePlatform').value;
+          const name = document.getElementById('profileName').value.trim();
+          if (!name) {
+            alert('Entre un nom de profil');
+            return;
+          }
+          const profiles = getProfiles();
+          if (!profiles[platform]) profiles[platform] = [];
+          if (!profiles[platform].includes(name)) profiles[platform].push(name);
+          saveProfiles(profiles);
+          document.getElementById('profileName').value = '';
+          loadProfilesList();
+          alert('Profil « ' + name + ' » ajouté pour ' + platform);
+        });
+      }
     }
     initMenu();
     // Sécurité : re-initialiser après le chargement complet
     window.addEventListener('load', initMenu);
-
-    // Langues simples
-    const translations = {
-      fr: { title: 'VidéoPrivée', sub: 'Envoie des vidéos de tous formats sur plusieurs plateformes' },
-      en: { title: 'VideoPrivate', sub: 'Send videos of all formats to multiple platforms' },
-      ar: { title: 'فيديو خاص', sub: 'أرسل فيديوهات بجميع الصيغ إلى عدة منصات' }
-    };
-    document.getElementById('langSelect').onchange = (e) => {
-      const lang = e.target.value;
-      const t = translations[lang] || translations.fr;
-      document.querySelector('h1').textContent = t.title;
-      document.querySelector('.subtitle').innerHTML = t.sub + '<br><strong>Gratuit · Illimité · 100 % privé</strong> <span class="badge">Local</span>';
-      localStorage.setItem('videoprivee_lang', lang);
-    };
-    const savedLang = localStorage.getItem('videoprivee_lang');
-    if (savedLang) {
-      document.getElementById('langSelect').value = savedLang;
-      document.getElementById('langSelect').dispatchEvent(new Event('change'));
-    }
-
-    // Gestion mot de passe / profils (simplifié)
-    document.getElementById('managePassword').onclick = () => {
-      alert('Pour changer le mot de passe, utilise « Mot de passe oublié » sur l’écran de connexion, ou le panneau admin.');
-      document.getElementById('sidebar').classList.remove('open');
-      document.getElementById('overlay').classList.remove('show');
-    };
-    document.getElementById('manageProfiles').onclick = () => {
-      document.getElementById('profilesModal').classList.remove('hidden');
-      loadProfilesList();
-      document.getElementById('sidebar').classList.remove('open');
-      document.getElementById('overlay').classList.remove('show');
-    };
-    document.getElementById('closeProfiles').onclick = () => {
-      document.getElementById('profilesModal').classList.add('hidden');
-    };
-    document.getElementById('addProfileBtn').onclick = () => {
-      const platform = document.getElementById('profilePlatform').value;
-      const name = document.getElementById('profileName').value.trim();
-      if (!name) return alert('Entre un nom de profil');
-      const profiles = getProfiles();
-      if (!profiles[platform]) profiles[platform] = [];
-      if (!profiles[platform].includes(name)) profiles[platform].push(name);
-      saveProfiles(profiles);
-      document.getElementById('profileName').value = '';
-      loadProfilesList();
-    };
-    function loadProfilesList() {
-      const profiles = getProfiles();
-      const div = document.getElementById('profilesList');
-      let html = '';
-      for (const [platform, names] of Object.entries(profiles)) {
-        html += `<div style="margin:0.4rem 0;"><strong>${platform}</strong> : ${names.join(', ')}</div>`;
-      }
-      div.innerHTML = html || '<em>Aucun profil enregistré.</em>';
-    }
 
     // Installation : cacher en mode standalone
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
