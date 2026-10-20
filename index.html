@@ -522,7 +522,6 @@
       <p style="color: var(--muted); font-size: 0.9rem;">Coche les réseaux, puis choisis les profils pour chacun.</p>
       <div class="platforms" id="platforms"></div>
       <button class="btn" id="confirmShareBtn" style="margin-top:1rem;width:100%;">Continuer avec la sélection</button>
-      <div class="quote-box" id="platformQuote" style="margin-top:1.5rem;"></div>
     </div>
 
     <div class="card">
@@ -615,7 +614,6 @@
       document.getElementById('menuBtn').classList.remove('hidden');
       if (typeof initMenu === 'function') initMenu();
       showDailyQuote();
-      showPlatformQuote();
       if (isAdmin) {
         const panel = document.getElementById('adminPanel');
         if (panel) panel.classList.remove('hidden');
@@ -707,13 +705,10 @@
       setTimeout(() => showMode('loginMode'), 1500);
     };
 
-    // Citations
+    // Citation uniquement dans l'en-tête
     function getDailyQuote() {
       const day = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
       return quotes[day % quotes.length];
-    }
-    function getRandomQuote() {
-      return quotes[Math.floor(Math.random() * quotes.length)];
     }
     function showDailyQuote() {
       const q = getDailyQuote();
@@ -723,10 +718,6 @@
         quoteEl.textContent = `"${q.text}"`;
         sourceEl.textContent = q.source;
       }
-    }
-    function showPlatformQuote() {
-      const q = getRandomQuote();
-      document.getElementById('platformQuote').innerHTML = `"${q.text}"<div class="quote-source">${q.source}</div>`;
     }
 
     // Admin functions
