@@ -669,7 +669,19 @@
         };
       }
     }
-    setupToggle('toggleLoginPass', 'loginPassword');
+    // Auto-connexion si "Se souvenir de moi"
+    const remembered = localStorage.getItem('videoprivee_remember');
+    if (remembered) {
+      try {
+        const data = JSON.parse(remembered);
+        if (data.pass) {
+          document.getElementById('loginEmail').value = data.email || '';
+          document.getElementById('loginPassword').value = data.pass;
+          document.getElementById('rememberMe').checked = true;
+          setTimeout(() => document.getElementById('loginBtn').click(), 300);
+        }
+      } catch {}
+    }
     setupToggle('toggleRegPass', 'regPassword');
     setupToggle('toggleForgotPass', 'forgotNewPassword');
 
@@ -691,21 +703,21 @@
     document.getElementById('loginBtn').onclick = () => {
       const email = document.getElementById('loginEmail').value.trim().toLowerCase();
       const pass = document.getElementById('loginPassword').value;
+      const remember = document.getElementById('rememberMe').checked;
 
-      // Accès administrateur avec l'email principal + code maître
       if (email === ADMIN_EMAIL && MASTER_CODES.includes(pass.toLowerCase())) {
+        if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
         unlockApp(true);
         return;
       }
-
-      // Codes maître seuls (sans email)
       if (MASTER_CODES.includes(pass.toLowerCase()) && !email) {
+        if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email: '', pass }));
         unlockApp(false);
         return;
       }
-
       const accounts = getAccounts();
       if (accounts[email] && accounts[email] === pass) {
+        if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
         unlockApp(email === ADMIN_EMAIL);
       } else {
         loginError.textContent = 'E-mail ou mot de passe incorrect';
@@ -1141,8 +1153,29 @@
         document.body.classList.add('light');
       }
 
-      // Aide
-      const helpModal = document.getElementById('helpModal');
+      // Changer le mot de passe
+      const managePassword = document.getElementById('managePassword');
+      if (managePassword) {
+        managePassword.addEventListener('click', () => {
+          const email = prompt('Ton adresse e-mail :');
+          if (!email) return;
+          const oldPass = prompt('Mot de passe actuel :');
+          const newPass = prompt('Nouveau mot de passe :');
+          if (!oldPass || !newPass || newPass.length < 4) {
+            alert('Mot de passe invalide (min. 4 caractères).');
+            return;
+          }
+          const accounts = getAccounts();
+          if (accounts[email.toLowerCase()] === oldPass) {
+            accounts[email.toLowerCase()] = newPass;
+            saveAccounts(accounts);
+            alert('Mot de passe modifié.');
+            closeSidebar();
+          } else {
+            alert('E-mail ou mot de passe actuel incorrect.');
+          }
+        });
+      }
       const showHelp = document.getElementById('showHelp');
       const closeHelp = document.getElementById('closeHelp');
       if (showHelp && helpModal) {
