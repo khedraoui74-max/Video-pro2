@@ -84,15 +84,15 @@
       position: fixed;
       top: 1rem;
       left: 1rem;
-      background: #f87171;
+      background: transparent;
       border: none;
-      color: white;
-      padding: 0.6rem 1rem;
-      border-radius: 12px;
-      font-size: 0.9rem;
+      width: 48px;
+      height: 48px;
       cursor: pointer;
       z-index: 300;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .sidebar {
       position: fixed;
@@ -412,7 +412,9 @@
 
   <!-- Menu toujours disponible -->
   <button class="menu-btn hidden" id="menuBtn">☰</button>
-  <button class="logout-btn hidden" id="logoutBtnTop" title="Déconnexion">⏻</button>
+  <button class="logout-btn hidden" id="logoutBtnTop" title="Déconnexion">
+    <img src="logout-btn.png" alt="Déconnexion" style="width:36px;height:36px;">
+  </button>
   <div class="overlay" id="overlay"></div>
   <div class="sidebar" id="sidebar">
     <h3>Menu</h3>
