@@ -80,6 +80,20 @@
       align-items: center;
       justify-content: center;
     }
+    .logout-btn {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      background: #f87171;
+      border: none;
+      color: white;
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      z-index: 300;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
     .sidebar {
       position: fixed;
       top: 0;
@@ -127,6 +141,49 @@
       background: #e8e8ee url('bg-gants.jpg') center/cover fixed no-repeat;
     }
     body.light::before { background: rgba(245,245,247,0.75); }
+    body.light .sidebar {
+      background: rgba(255,255,255,0.98);
+      border-left: 1px solid #ddd;
+      color: #1a1a1e;
+    }
+    body.light .sidebar h3,
+    body.light .sidebar label,
+    body.light .sidebar button,
+    body.light .sidebar select {
+      color: #1a1a1e !important;
+    }
+    body.light .sidebar button,
+    body.light .sidebar select {
+      background: #f0f0f5;
+      border-color: #ccc;
+    }
+    body.light .sidebar button:hover {
+      background: #e0e0e8;
+    }
+    body.light .info-item {
+      background: rgba(255,255,255,0.8);
+      color: #1a1a1e;
+    }
+    body.light .status {
+      background: rgba(255,255,255,0.9);
+      color: #333;
+    }
+    body.light .header-quote {
+      color: #333;
+    }
+    body.light .card,
+    body.light .card h2,
+    body.light .card h3,
+    body.light .card p,
+    body.light .card label {
+      color: #1a1a1e;
+    }
+    body.light input,
+    body.light select {
+      background: #fff;
+      color: #1a1a1e;
+      border-color: #ccc;
+    }
     .card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -355,6 +412,7 @@
 
   <!-- Menu toujours disponible -->
   <button class="menu-btn hidden" id="menuBtn">☰</button>
+  <button class="logout-btn hidden" id="logoutBtnTop">Déconnexion</button>
   <div class="overlay" id="overlay"></div>
   <div class="sidebar" id="sidebar">
     <h3>Menu</h3>
@@ -611,6 +669,7 @@
       loginScreen.classList.add('hidden');
       mainApp.classList.remove('hidden');
       document.getElementById('menuBtn').classList.remove('hidden');
+      document.getElementById('logoutBtnTop').classList.remove('hidden');
       if (typeof initMenu === 'function') initMenu();
       showDailyQuote();
       if (isAdmin) {
@@ -1129,8 +1188,21 @@
         if (savedLang) langSelect.value = savedLang;
       }
 
-      // Ajout de profil
-      const addProfileBtn = document.getElementById('addProfileBtn');
+      // Déconnexion (bouton haut gauche uniquement)
+      const logoutBtnTop = document.getElementById('logoutBtnTop');
+      if (logoutBtnTop) {
+        logoutBtnTop.addEventListener('click', () => {
+          if (confirm('Se déconnecter ?')) {
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('menuBtn').classList.add('hidden');
+            document.getElementById('logoutBtnTop').classList.add('hidden');
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginEmail').value = '';
+            closeSidebar();
+          }
+        });
+      }
       if (addProfileBtn) {
         addProfileBtn.addEventListener('click', () => {
           const platform = document.getElementById('profilePlatform').value;
