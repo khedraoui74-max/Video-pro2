@@ -1238,14 +1238,14 @@
           const modal = document.createElement('div');
           modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;';
           const images = [
-            'logout-images/logout1.jpg',
-            'logout-images/logout2.jpg',
-            'logout-images/logout3.jpg'
+            'logout1.jpg',
+            'logout2.jpg',
+            'logout3.jpg'
           ];
           const img = images[day % images.length];
           modal.innerHTML = `
             <div style="background:var(--card);border-radius:16px;padding:1.5rem;text-align:center;max-width:420px;border:1px solid var(--border);">
-              <img src="${img}" alt="Logout" style="width:100%;max-height:280px;object-fit:cover;border-radius:12px;margin-bottom:1rem;">
+              <img src="${img}" alt="" style="width:100%;max-height:280px;object-fit:cover;border-radius:12px;margin-bottom:1rem;" onerror="this.style.display='none'">
               <div style="font-size:3rem;margin-bottom:0.5rem;">${msg.emoji}</div>
               <p style="font-size:1.1rem;line-height:1.5;margin:0 0 1.2rem;">${msg.text}</p>
               <button class="btn" id="confirmLogout" style="width:100%;">OK, à plus !</button>
