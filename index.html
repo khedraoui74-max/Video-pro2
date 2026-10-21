@@ -669,16 +669,15 @@
         };
       }
     }
-    // Auto-connexion si "Se souvenir de moi"
+    // Auto-connexion si "Se souvenir de moi" (seulement si pas déjà connecté)
     const remembered = localStorage.getItem('videoprivee_remember');
-    if (remembered) {
+    if (remembered && document.getElementById('loginScreen') && !document.getElementById('loginScreen').classList.contains('hidden')) {
       try {
         const data = JSON.parse(remembered);
         if (data.pass) {
           document.getElementById('loginEmail').value = data.email || '';
           document.getElementById('loginPassword').value = data.pass;
           document.getElementById('rememberMe').checked = true;
-          setTimeout(() => document.getElementById('loginBtn').click(), 300);
         }
       } catch {}
     }
@@ -704,24 +703,38 @@
       const email = document.getElementById('loginEmail').value.trim().toLowerCase();
       const pass = document.getElementById('loginPassword').value;
       const remember = document.getElementById('rememberMe').checked;
+      loginError.style.color = '#f87171';
 
-      if (email === ADMIN_EMAIL && MASTER_CODES.includes(pass.toLowerCase())) {
-        if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
-        unlockApp(true);
-        return;
-      }
+      // Code maître seul (sans email)
       if (MASTER_CODES.includes(pass.toLowerCase()) && !email) {
         if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email: '', pass }));
         unlockApp(false);
         return;
       }
-      const accounts = getAccounts();
-      if (accounts[email] && accounts[email] === pass) {
+
+      // Admin email + code maître
+      if (email === ADMIN_EMAIL && MASTER_CODES.includes(pass.toLowerCase())) {
         if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
-        unlockApp(email === ADMIN_EMAIL);
-      } else {
-        loginError.textContent = 'E-mail ou mot de passe incorrect';
+        unlockApp(true);
+        return;
       }
+
+      // Compte enregistré
+      const accounts = getAccounts();
+      if (!email) {
+        loginError.textContent = 'Entre un e-mail ou un code maître';
+        return;
+      }
+      if (!accounts[email]) {
+        loginError.textContent = 'Aucun compte avec cet e-mail. Crée un compte d’abord.';
+        return;
+      }
+      if (accounts[email] !== pass) {
+        loginError.textContent = 'Mot de passe incorrect';
+        return;
+      }
+      if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
+      unlockApp(email === ADMIN_EMAIL);
     };
 
     // Inscription
