@@ -1177,23 +1177,104 @@
 
       // Langue
       const langSelect = document.getElementById('langSelect');
+      const i18n = {
+        fr: {
+          title: 'VidéoPrivée',
+          sub: 'Envoie des vidéos de tous formats sur plusieurs plateformes',
+          free: 'Gratuit · Illimité · 100 % privé',
+          drop: 'Glisse-dépose ta vidéo ici<br>ou clique pour choisir un fichier',
+          download: 'Télécharger la vidéo',
+          remove: 'Retirer cette vidéo',
+          removeNet: 'Retirer des réseaux',
+          share: 'Partager sur',
+          profiles: 'Gérer les profils',
+          help: 'Comment utiliser l’application',
+          close: 'Fermer',
+          themeDay: 'Mode jour',
+          themeNight: 'Mode nuit',
+          login: 'Se connecter',
+          register: 'Créer un compte',
+          forgot: 'Mot de passe oublié ?'
+        },
+        en: {
+          title: 'VideoPrivate',
+          sub: 'Send videos of all formats to multiple platforms',
+          free: 'Free · Unlimited · 100% private',
+          drop: 'Drag and drop your video here<br>or click to choose a file',
+          download: 'Download video',
+          remove: 'Remove this video',
+          removeNet: 'Remove from networks',
+          share: 'Share on',
+          profiles: 'Manage profiles',
+          help: 'How to use the app',
+          close: 'Close',
+          themeDay: 'Day mode',
+          themeNight: 'Night mode',
+          login: 'Log in',
+          register: 'Create account',
+          forgot: 'Forgot password?'
+        },
+        ar: {
+          title: 'فيديو خاص',
+          sub: 'أرسل فيديوهات بجميع الصيغ إلى عدة منصات',
+          free: 'مجاني · غير محدود · خاص 100%',
+          drop: 'اسحب وأفلت الفيديو هنا<br>أو اضغط لاختيار ملف',
+          download: 'تحميل الفيديو',
+          remove: 'إزالة هذا الفيديو',
+          removeNet: 'إزالة من الشبكات',
+          share: 'مشاركة على',
+          profiles: 'إدارة الحسابات',
+          help: 'كيفية استخدام التطبيق',
+          close: 'إغلاق',
+          themeDay: 'وضع النهار',
+          themeNight: 'وضع الليل',
+          login: 'تسجيل الدخول',
+          register: 'إنشاء حساب',
+          forgot: 'نسيت كلمة المرور؟'
+        }
+      };
+      function applyLang(lang) {
+        const t = i18n[lang] || i18n.fr;
+        const h1 = document.querySelector('h1');
+        const sub = document.querySelector('.subtitle');
+        if (h1) h1.textContent = t.title;
+        if (sub) sub.innerHTML = t.sub + '<br><strong>' + t.free + '</strong> <span class="badge">Local</span>';
+        const drop = document.querySelector('.dropzone p');
+        if (drop) drop.innerHTML = t.drop;
+        const dl = document.getElementById('downloadBtn');
+        if (dl) dl.textContent = t.download;
+        const rm = document.getElementById('removeVideoBtn');
+        if (rm) rm.textContent = t.remove;
+        const rn = document.getElementById('removeFromNetworksBtn');
+        if (rn) rn.textContent = t.removeNet;
+        const shareTitle = document.querySelector('#shareCard h3');
+        if (shareTitle) shareTitle.textContent = t.share;
+        const prof = document.getElementById('manageProfiles');
+        if (prof) prof.textContent = t.profiles;
+        const help = document.getElementById('showHelp');
+        if (help) help.textContent = t.help;
+        const close = document.getElementById('closeMenu');
+        if (close) close.textContent = t.close;
+        const themeBtn = document.getElementById('toggleTheme');
+        if (themeBtn) {
+          const isLight = document.body.classList.contains('light');
+          themeBtn.textContent = isLight ? t.themeNight : t.themeDay;
+        }
+        const loginBtn = document.getElementById('loginBtn');
+        if (loginBtn) loginBtn.textContent = t.login;
+        const regBtn = document.getElementById('showRegister');
+        if (regBtn) regBtn.textContent = t.register;
+        const forgotBtn = document.getElementById('showForgot');
+        if (forgotBtn) forgotBtn.textContent = t.forgot;
+        localStorage.setItem('videoprivee_lang', lang);
+      }
       if (langSelect) {
-        langSelect.addEventListener('change', (e) => {
-          const lang = e.target.value;
-          const translations = {
-            fr: { title: 'VidéoPrivée', sub: 'Envoie des vidéos de tous formats sur plusieurs plateformes' },
-            en: { title: 'VideoPrivate', sub: 'Send videos of all formats to multiple platforms' },
-            ar: { title: 'فيديو خاص', sub: 'أرسل فيديوهات بجميع الصيغ إلى عدة منصات' }
-          };
-          const t = translations[lang] || translations.fr;
-          const h1 = document.querySelector('h1');
-          const sub = document.querySelector('.subtitle');
-          if (h1) h1.textContent = t.title;
-          if (sub) sub.innerHTML = t.sub + '<br><strong>Gratuit · Illimité · 100 % privé</strong> <span class="badge">Local</span>';
-          localStorage.setItem('videoprivee_lang', lang);
-        });
-        const savedLang = localStorage.getItem('videoprivee_lang');
-        if (savedLang) langSelect.value = savedLang;
+        langSelect.addEventListener('change', (e) => applyLang(e.target.value));
+        const saved = localStorage.getItem('videoprivee_lang');
+        if (saved) {
+          langSelect.value = saved;
+          applyLang(saved);
+        }
       }
 
       // Déconnexion (bouton haut gauche uniquement)
