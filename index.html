@@ -362,6 +362,12 @@
       <img src="icon-512.png" alt="Logo" style="width:100px;height:100px;border-radius:16px;margin-bottom:0.5rem;">
       <h2>VidéoPrivée</h2>
       <p style="color:var(--muted);font-size:0.9rem;margin-top:0;">Application privée</p>
+      <label style="display:block;margin:0.5rem 0 0.3rem;font-size:0.85rem;">Langue / Language</label>
+      <select id="langSelectLogin" style="width:100%;padding:0.6rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;margin-bottom:0.5rem;">
+        <option value="fr">Français</option>
+        <option value="en">English</option>
+        <option value="ar">العربية</option>
+      </select>
 
       <!-- Mode connexion -->
       <div id="loginMode">
@@ -1269,12 +1275,26 @@
         localStorage.setItem('videoprivee_lang', lang);
       }
       if (langSelect) {
-        langSelect.addEventListener('change', (e) => applyLang(e.target.value));
+        langSelect.addEventListener('change', (e) => {
+          applyLang(e.target.value);
+          const loginSel = document.getElementById('langSelectLogin');
+          if (loginSel) loginSel.value = e.target.value;
+        });
         const saved = localStorage.getItem('videoprivee_lang');
         if (saved) {
           langSelect.value = saved;
           applyLang(saved);
         }
+      }
+      // Langue sur l'écran de connexion
+      const langSelectLogin = document.getElementById('langSelectLogin');
+      if (langSelectLogin) {
+        langSelectLogin.addEventListener('change', (e) => {
+          applyLang(e.target.value);
+          if (langSelect) langSelect.value = e.target.value;
+        });
+        const saved = localStorage.getItem('videoprivee_lang');
+        if (saved) langSelectLogin.value = saved;
       }
 
       // Déconnexion (bouton haut gauche uniquement)
