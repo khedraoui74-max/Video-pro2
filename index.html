@@ -416,7 +416,7 @@
   <div class="overlay" id="overlay"></div>
   <div class="sidebar" id="sidebar">
     <h3>Menu</h3>
-    <button id="toggleTheme">Mode jour / nuit</button>
+    <button id="toggleTheme">Mode jour</button>
     <label style="display:block;margin:1rem 0 0.3rem;font-size:0.9rem;">Langue</label>
     <select id="langSelect">
       <option value="fr">Français</option>
@@ -1118,9 +1118,15 @@
       // Theme
       const toggleThemeBtn = document.getElementById('toggleTheme');
       if (toggleThemeBtn) {
+        function updateThemeBtn() {
+          const isLight = document.body.classList.contains('light');
+          toggleThemeBtn.textContent = isLight ? 'Mode nuit' : 'Mode jour';
+        }
+        updateThemeBtn();
         toggleThemeBtn.addEventListener('click', () => {
           document.body.classList.toggle('light');
           localStorage.setItem('videoprivee_theme', document.body.classList.contains('light') ? 'light' : 'dark');
+          updateThemeBtn();
         });
       }
       if (localStorage.getItem('videoprivee_theme') === 'light') {
