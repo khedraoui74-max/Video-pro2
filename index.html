@@ -412,7 +412,7 @@
 
   <!-- Menu toujours disponible -->
   <button class="menu-btn hidden" id="menuBtn">☰</button>
-  <button class="logout-btn hidden" id="logoutBtnTop">Déconnexion</button>
+  <button class="logout-btn hidden" id="logoutBtnTop" title="Déconnexion">⏻</button>
   <div class="overlay" id="overlay"></div>
   <div class="sidebar" id="sidebar">
     <h3>Menu</h3>
@@ -1198,7 +1198,60 @@
       const logoutBtnTop = document.getElementById('logoutBtnTop');
       if (logoutBtnTop) {
         logoutBtnTop.addEventListener('click', () => {
-          if (confirm('Se déconnecter ?')) {
+          const messages = [
+            { text: "Au revoir ! Tes vidéos t'attendent demain... enfin, si elles n'ont pas fugué.", emoji: "👋" },
+            { text: "Déconnexion réussie. Les plateformes sociales vont s'ennuyer.", emoji: "😴" },
+            { text: "C'est fini pour aujourd'hui. Même les algorithmes ont besoin de pause.", emoji: "🤖" },
+            { text: "À plus ! N'oublie pas : les vidéos ne se partagent pas toutes seules.", emoji: "🎬" },
+            { text: "Session terminée. Les gants de boxe se reposent aussi.", emoji: "🥊" },
+            { text: "Déconnecté. Le mode privé est maintenant... très privé.", emoji: "🔒" },
+            { text: "Bye ! Tes profils restent bien au chaud dans le navigateur.", emoji: "💾" },
+            { text: "La porte se ferme. Les likes peuvent attendre.", emoji: "🚪" },
+            { text: "Extinction des feux. Même TikTok a besoin de dormir.", emoji: "🌙" },
+            { text: "Tu pars ? Les algorithmes vont te chercher partout.", emoji: "🔍" },
+            { text: "Déconnexion propre. Aucune vidéo n'a été blessée.", emoji: "✅" },
+            { text: "À demain ! Ou plus tard. On ne juge pas.", emoji: "⏰" },
+            { text: "Le rideau tombe. Applaudissements pour toi.", emoji: "👏" },
+            { text: "Batterie sociale rechargée... ou presque.", emoji: "🔋" },
+            { text: "Sortie de scène. Les gants restent sur le ring.", emoji: "🏆" },
+            { text: "Mode avion activé... enfin, presque.", emoji: "✈️" },
+            { text: "Les notifications peuvent se reposer.", emoji: "🔕" },
+            { text: "C'est tout pour aujourd'hui. Même les mèmes ont des limites.", emoji: "😂" },
+            { text: "Déconnecté avec style. Les gants approuvent.", emoji: "😎" },
+            { text: "La session est finie. Les vidéos font la sieste.", emoji: "💤" },
+            { text: "Tu reviens quand tu veux. On garde la lumière allumée.", emoji: "💡" },
+            { text: "Fin de transmission. Over and out.", emoji: "📡" },
+            { text: "Les plateformes te disent au revoir... à contrecœur.", emoji: "🥺" },
+            { text: "Déconnexion réussie. Zéro donnée partagée, comme promis.", emoji: "🛡️" },
+            { text: "À plus dans le bus ! Enfin, dans l'application.", emoji: "🚌" },
+            { text: "Les gants de boxe te saluent.", emoji: "🥊" },
+            { text: "Session close. Les cookies locaux restent sages.", emoji: "🍪" },
+            { text: "Tu as bien mérité une pause. Les vidéos aussi.", emoji: "☕" },
+            { text: "Extinction. Le logo te fait un clin d'œil.", emoji: "😉" },
+            { text: "C'est bon, tu peux y aller. On s'occupe du reste.", emoji: "👍" }
+          ];
+          const day = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+          const msg = messages[day % messages.length];
+          
+          const modal = document.createElement('div');
+          modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;';
+          const images = [
+            'logout-images/logout1.jpg',
+            'logout-images/logout2.jpg',
+            'logout-images/logout3.jpg'
+          ];
+          const img = images[day % images.length];
+          modal.innerHTML = `
+            <div style="background:var(--card);border-radius:16px;padding:1.5rem;text-align:center;max-width:420px;border:1px solid var(--border);">
+              <img src="${img}" alt="Logout" style="width:100%;max-height:280px;object-fit:cover;border-radius:12px;margin-bottom:1rem;">
+              <div style="font-size:3rem;margin-bottom:0.5rem;">${msg.emoji}</div>
+              <p style="font-size:1.1rem;line-height:1.5;margin:0 0 1.2rem;">${msg.text}</p>
+              <button class="btn" id="confirmLogout" style="width:100%;">OK, à plus !</button>
+            </div>
+          `;
+          document.body.appendChild(modal);
+          modal.querySelector('#confirmLogout').onclick = () => {
+            document.body.removeChild(modal);
             document.getElementById('mainApp').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('menuBtn').classList.add('hidden');
@@ -1206,7 +1259,7 @@
             document.getElementById('loginPassword').value = '';
             document.getElementById('loginEmail').value = '';
             closeSidebar();
-          }
+          };
         });
       }
       if (addProfileBtn) {
