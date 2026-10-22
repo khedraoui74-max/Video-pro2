@@ -698,6 +698,7 @@
         if (panel) panel.classList.remove('hidden');
         loadAdminData();
       }
+      loadSavedVideo();
     }
 
     // Connexion
@@ -854,7 +855,33 @@
     const platformsDiv = document.getElementById('platforms');
 
     let currentFile = null;
-    let objectUrl = null;
+    // Sauvegarde de la vidéo en cours (IndexedDB)
+    function saveCurrentVideo(file) {
+      const req = indexedDB.open('videoprivee', 1);
+      req.onupgradeneeded = () => req.result.createObjectStore('video');
+      req.onsuccess = () => {
+        const tx = req.result.transaction('video', 'readwrite');
+        tx.objectStore('video').put(file, 'current');
+      };
+    }
+    function loadSavedVideo() {
+      const req = indexedDB.open('videoprivee', 1);
+      req.onupgradeneeded = () => req.result.createObjectStore('video');
+      req.onsuccess = () => {
+        const tx = req.result.transaction('video', 'readonly');
+        const get = tx.objectStore('video').get('current');
+        get.onsuccess = () => {
+          if (get.result) handleFile(get.result);
+        };
+      };
+    }
+    function clearSavedVideo() {
+      const req = indexedDB.open('videoprivee', 1);
+      req.onsuccess = () => {
+        const tx = req.result.transaction('video', 'readwrite');
+        tx.objectStore('video').delete('current');
+      };
+    }
 
     const platforms = [
       { name: 'TikTok', icon: '🎵', url: 'https://www.tiktok.com/upload' },
@@ -911,6 +938,7 @@
       currentFile = file;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
       objectUrl = URL.createObjectURL(file);
+      saveCurrentVideo(file);
       const dropVideo = document.getElementById('dropzoneVideo');
       if (dropVideo) {
         dropVideo.src = objectUrl;
@@ -1074,6 +1102,7 @@
         if (objectUrl) URL.revokeObjectURL(objectUrl);
         currentFile = null;
         objectUrl = null;
+        clearSavedVideo();
         const dropVideo = document.getElementById('dropzoneVideo');
         const dropContent = document.getElementById('dropzoneContent');
         if (dropVideo) {
@@ -1474,7 +1503,10 @@
       }
     };
 
-    window.addEventListener('beforeunload', () => { if (objectUrl) URL.revokeObjectURL(objectUrl); });
+    // Restaurer la vidéo si on revient dans l'application
+    if (document.getElementById('mainApp') && !document.getElementById('mainApp').classList.contains('hidden')) {
+      loadSavedVideo();
+    }
 
     // Enregistrement du Service Worker pour le mode hors ligne / PWA
     if ('serviceWorker' in navigator) {
