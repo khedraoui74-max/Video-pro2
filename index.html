@@ -563,17 +563,18 @@
 
     <div class="card">
       <div class="dropzone" id="dropzone">
-        <div style="font-size: 3rem;">🎬</div>
-        <p><strong>Glisse-dépose ta vidéo ici</strong></p>
-        <p>ou clique pour choisir un fichier</p>
-        <p style="font-size: 0.85rem;">Tous formats acceptés (MP4, MOV, AVI, MKV, WebM, etc.)</p>
+        <div id="dropzoneContent">
+          <div style="font-size: 3rem;">🎬</div>
+          <p><strong>Glisse-dépose ta vidéo ici</strong></p>
+          <p>ou clique pour choisir un fichier</p>
+          <p style="font-size: 0.85rem;">Tous formats acceptés (MP4, MOV, AVI, MKV, WebM, etc.)</p>
+        </div>
+        <video id="dropzoneVideo" controls style="display:none;width:100%;max-height:300px;border-radius:8px;"></video>
       </div>
       <input type="file" id="fileInput" accept="video/*,.mkv,.avi,.mov,.wmv,.flv">
     </div>
 
     <div class="card" id="previewCard" style="display: none;">
-      <h3>Aperçu</h3>
-      <video id="videoPreview" controls></video>
       <div class="info" id="videoInfo"></div>
       <div class="actions">
         <button class="btn" id="downloadBtn">Télécharger la vidéo</button>
@@ -844,7 +845,7 @@
     const fileInput = document.getElementById('fileInput');
     const previewCard = document.getElementById('previewCard');
     const shareCard = document.getElementById('shareCard');
-    const videoPreview = document.getElementById('videoPreview');
+    const dropzoneVideo = document.getElementById('dropzoneVideo');
     const videoInfo = document.getElementById('videoInfo');
     const status = document.getElementById('status');
     const downloadBtn = document.getElementById('downloadBtn');
@@ -910,7 +911,13 @@
       currentFile = file;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
       objectUrl = URL.createObjectURL(file);
-      videoPreview.src = objectUrl;
+      const dropVideo = document.getElementById('dropzoneVideo');
+      if (dropVideo) {
+        dropVideo.src = objectUrl;
+        dropVideo.style.display = 'block';
+      }
+      const dropContent = document.getElementById('dropzoneContent');
+      if (dropContent) dropContent.style.display = 'none';
       previewCard.style.display = 'block';
       shareCard.style.display = 'block';
 
@@ -1067,7 +1074,13 @@
         if (objectUrl) URL.revokeObjectURL(objectUrl);
         currentFile = null;
         objectUrl = null;
-        videoPreview.src = '';
+        const dropVideo = document.getElementById('dropzoneVideo');
+        const dropContent = document.getElementById('dropzoneContent');
+        if (dropVideo) {
+          dropVideo.src = '';
+          dropVideo.style.display = 'none';
+        }
+        if (dropContent) dropContent.style.display = 'block';
         previewCard.style.display = 'none';
         shareCard.style.display = 'none';
         videoInfo.innerHTML = '';
