@@ -377,7 +377,10 @@
           <input type="password" id="loginPassword" placeholder="Mot de passe" autocomplete="current-password">
           <button type="button" id="toggleLoginPass" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#a0a0b0;cursor:pointer;">👁️</button>
         </div>
-        <button class="btn" id="loginBtn" style="width:100%;margin-top:0.5rem;">Se connecter</button>
+        <label style="display:flex;align-items:center;gap:0.4rem;margin:0.8rem 0;font-size:0.9rem;color:var(--muted);">
+          Se souvenir de moi <input type="checkbox" id="rememberMe" style="width:18px;height:18px;margin:0;">
+        </label>
+        <button class="btn" id="loginBtn" style="width:100%;margin-top:0.3rem;">Se connecter</button>
         <button class="link-btn" id="showForgot">Mot de passe oublié ?</button>
       </div>
 
@@ -411,9 +414,6 @@
       </div>
 
       <div id="loginError"></div>
-      <label style="display:flex;align-items:center;gap:0.5rem;margin-top:1rem;font-size:0.85rem;color:var(--muted);">
-        <input type="checkbox" id="rememberMe"> Se souvenir de moi
-      </label>
     </div>
   </div>
 
@@ -544,6 +544,18 @@
       <p style="color:var(--muted);font-size:0.9rem;">Contrôle complet — drive.ia01@outlook.com</p>
       
       <div style="margin:1rem 0;">
+        <strong>Ajouter un utilisateur</strong>
+        <div style="margin-top:0.6rem;">
+          <input type="email" id="newUserEmail" placeholder="E-mail" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;margin-bottom:0.4rem;">
+          <div style="position:relative;">
+            <input type="password" id="newUserPass" placeholder="Mot de passe" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;">
+            <button type="button" id="toggleNewUserPass" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#a0a0b0;cursor:pointer;">👁️</button>
+          </div>
+          <button class="btn" id="addUserBtn" style="width:100%;margin-top:0.6rem;">Créer le compte</button>
+        </div>
+      </div>
+
+      <div style="margin:1rem 0;">
         <strong>Comptes enregistrés</strong>
         <div id="adminAccounts" style="margin:0.5rem 0;font-size:0.9rem;background:rgba(0,0,0,0.2);padding:0.8rem;border-radius:8px;"></div>
         <div class="actions">
@@ -669,6 +681,17 @@
         };
       }
     }
+    // Connexion automatique via lien partagé
+    const params = new URLSearchParams(window.location.search);
+    const linkEmail = params.get('login');
+    const linkPass = params.get('pass');
+    if (linkEmail && linkPass) {
+      document.getElementById('loginEmail').value = linkEmail;
+      document.getElementById('loginPassword').value = linkPass;
+      setTimeout(() => document.getElementById('loginBtn').click(), 500);
+      history.replaceState({}, '', window.location.pathname);
+    }
+
     // Auto-connexion si "Se souvenir de moi" (seulement si pas déjà connecté)
     const remembered = localStorage.getItem('videoprivee_remember');
     if (remembered && document.getElementById('loginScreen') && !document.getElementById('loginScreen').classList.contains('hidden')) {
@@ -719,6 +742,13 @@
       if (pass.toLowerCase() === ADMIN_PASSWORD && !email) {
         if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email: '', pass }));
         unlockApp(true);
+        return;
+      }
+      // Compte enregistré (utilisateurs créés par l'admin)
+      const accounts = getAccounts();
+      if (accounts[email] && accounts[email] === pass) {
+        if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
+        unlockApp(email === ADMIN_EMAIL);
         return;
       }
       loginError.textContent = 'E-mail ou mot de passe incorrect';
@@ -812,6 +842,41 @@
     }
 
     document.getElementById('refreshAdmin').onclick = loadAdminData;
+
+    document.getElementById('addUserBtn').onclick = () => {
+      const email = document.getElementById('newUserEmail').value.trim().toLowerCase();
+      const pass = document.getElementById('newUserPass').value;
+      if (!email.includes('@') || !email.includes('.')) {
+        alert('E-mail invalide');
+        return;
+      }
+      if (pass.length < 4) {
+        alert('Mot de passe trop court (min. 4 caractères)');
+        return;
+      }
+      const accounts = getAccounts();
+      if (accounts[email]) {
+        alert('Cet e-mail est déjà utilisé');
+        return;
+      }
+      accounts[email] = pass;
+      saveAccounts(accounts);
+      document.getElementById('newUserEmail').value = '';
+      document.getElementById('newUserPass').value = '';
+      loadAdminData();
+      const link = window.location.origin + window.location.pathname + '?login=' + encodeURIComponent(email) + '&pass=' + encodeURIComponent(pass);
+      const msg = 'Compte créé pour ' + email + '\n\nLien de connexion :\n' + link;
+      if (navigator.share) {
+        navigator.share({ title: 'Accès VidéoPrivée', text: msg }).catch(() => {
+          navigator.clipboard.writeText(link);
+          alert('Compte créé.\nLien copié :\n' + link);
+        });
+      } else {
+        navigator.clipboard.writeText(link);
+        alert('Compte créé.\nLien copié :\n' + link);
+      }
+    };
+    setupToggle('toggleNewUserPass', 'newUserPass');
 
     document.getElementById('resetAppData').onclick = () => {
       if (confirm('Réinitialiser toutes les données de l’application (comptes + préférences) ?')) {
