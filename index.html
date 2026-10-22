@@ -605,8 +605,8 @@
   <script>
     // Compte administrateur principal
     const ADMIN_EMAIL = 'drive.ia01@outlook.com';
-    // Codes maître (toujours acceptés)
-    const MASTER_CODES = ['hessus', 'hessuusssss', 'master', 'prive', 'video123'];
+    const ADMIN_PASSWORD = 'prive';
+    const MASTER_CODES = ['prive'];
 
     // Citations
     const quotes = [
@@ -649,8 +649,6 @@
     }
 
     document.getElementById('showForgot').onclick = () => showMode('forgotMode');
-    document.getElementById('showRegister').onclick = () => showMode('registerMode');
-    document.getElementById('showLoginFromReg').onclick = () => showMode('loginMode');
     document.getElementById('showLoginFromForgot').onclick = () => showMode('loginMode');
 
     // Afficher / masquer les mots de passe
@@ -705,36 +703,18 @@
       const remember = document.getElementById('rememberMe').checked;
       loginError.style.color = '#f87171';
 
-      // Code maître seul (sans email)
-      if (MASTER_CODES.includes(pass.toLowerCase()) && !email) {
-        if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email: '', pass }));
-        unlockApp(false);
-        return;
-      }
-
-      // Admin email + code maître
-      if (email === ADMIN_EMAIL && MASTER_CODES.includes(pass.toLowerCase())) {
+      // Admin uniquement
+      if (email === ADMIN_EMAIL && pass.toLowerCase() === ADMIN_PASSWORD) {
         if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
         unlockApp(true);
         return;
       }
-
-      // Compte enregistré
-      const accounts = getAccounts();
-      if (!email) {
-        loginError.textContent = 'Entre un e-mail ou un code maître';
+      if (pass.toLowerCase() === ADMIN_PASSWORD && !email) {
+        if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email: '', pass }));
+        unlockApp(true);
         return;
       }
-      if (!accounts[email]) {
-        loginError.textContent = 'Aucun compte avec cet e-mail. Crée un compte d’abord.';
-        return;
-      }
-      if (accounts[email] !== pass) {
-        loginError.textContent = 'Mot de passe incorrect';
-        return;
-      }
-      if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
-      unlockApp(email === ADMIN_EMAIL);
+      loginError.textContent = 'E-mail ou mot de passe incorrect';
     };
 
     // Inscription
