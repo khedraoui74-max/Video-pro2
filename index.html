@@ -557,19 +557,11 @@
 
       <div style="margin:1rem 0;">
         <strong>Comptes enregistrés</strong>
-        <div id="adminAccounts" style="margin:0.5rem 0;font-size:0.9rem;background:rgba(0,0,0,0.2);padding:0.8rem;border-radius:8px;"></div>
+        <div id="adminAccounts" style="margin:0.5rem 0;font-size:0.9rem;"></div>
         <div class="actions">
-          <button class="btn btn-secondary" id="refreshAdmin">Rafraîchir</button>
-          <button class="btn btn-secondary" id="clearAllAccounts" style="border-color:#f87171;color:#f87171;">Effacer tous les comptes</button>
+          <button class="btn btn-secondary" id="clearAllAccounts" style="border-color:#f87171;color:#f87171;">Supprimer tous les comptes</button>
+          <button class="btn btn-secondary" id="suspendAllBtn" style="border-color:#fbbf24;color:#fbbf24;">Suspendre tous</button>
         </div>
-      </div>
-
-      <div style="margin:1rem 0;">
-        <strong>Contrôles de l’application</strong>
-        <div class="actions" style="margin-top:0.6rem;">
-          <button class="btn btn-secondary" id="resetAppData">Réinitialiser toutes les données</button>
-        </div>
-        <p id="adminStatus" style="font-size:0.85rem;color:var(--muted);margin-top:0.8rem;"></p>
       </div>
     </div>
 
@@ -746,7 +738,12 @@
       }
       // Compte enregistré (utilisateurs créés par l'admin)
       const accounts = getAccounts();
+      const suspended = getSuspended();
       if (accounts[email] && accounts[email] === pass) {
+        if (suspended.includes(email)) {
+          loginError.textContent = 'Ce compte est suspendu.';
+          return;
+        }
         if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
         unlockApp(email === ADMIN_EMAIL);
         return;
@@ -829,19 +826,89 @@
     }
 
     // Admin functions
+    function getSuspended() {
+      try { return JSON.parse(localStorage.getItem('videoprivee_suspended') || '[]'); }
+      catch { return []; }
+    }
+    function saveSuspended(list) {
+      localStorage.setItem('videoprivee_suspended', JSON.stringify(list));
+    }
+    function getHistory() {
+      try { return JSON.parse(localStorage.getItem('videoprivee_history') || '{}'); }
+      catch { return {}; }
+    }
+    function addHistory(email, action) {
+      const h = getHistory();
+      if (!h[email]) h[email] = [];
+      h[email].push({ action, date: new Date().toLocaleString() });
+      localStorage.setItem('videoprivee_history', JSON.stringify(h));
+    }
+
     function loadAdminData() {
       const accounts = getAccounts();
+      const suspended = getSuspended();
       const div = document.getElementById('adminAccounts');
       const emails = Object.keys(accounts);
       if (emails.length === 0) {
         div.innerHTML = '<em>Aucun compte enregistré.</em>';
-      } else {
-        div.innerHTML = emails.map(e => `• ${e}`).join('<br>');
+        return;
       }
-      document.getElementById('adminStatus').textContent = `Comptes : ${emails.length}`;
+      div.innerHTML = emails.map(email => {
+        const isSusp = suspended.includes(email);
+        return `
+          <div style="background:rgba(0,0,0,0.2);padding:0.6rem;border-radius:8px;margin-bottom:0.4rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span>${email} ${isSusp ? '<span style="color:#fbbf24;font-size:0.75rem;">(suspendu)</span>' : ''}</span>
+              <select class="userAction" data-email="${email}" style="padding:0.3rem;border-radius:6px;background:#1a1a1e;color:white;border:1px solid #333;">
+                <option value="">Actions</option>
+                <option value="reset">Réinitialiser mot de passe</option>
+                <option value="suspend">${isSusp ? 'Réactiver' : 'Suspendre'}</option>
+                <option value="history">Historique</option>
+                <option value="delete">Supprimer</option>
+              </select>
+            </div>
+          </div>`;
+      }).join('');
+      div.querySelectorAll('.userAction').forEach(sel => {
+        sel.onchange = () => handleUserAction(sel.dataset.email, sel.value);
+      });
     }
 
-    document.getElementById('refreshAdmin').onclick = loadAdminData;
+    function handleUserAction(email, action) {
+      if (!action) return;
+      const accounts = getAccounts();
+      if (action === 'reset') {
+        const newPass = prompt('Nouveau mot de passe pour ' + email + ' :');
+        if (newPass && newPass.length >= 4) {
+          accounts[email] = newPass;
+          saveAccounts(accounts);
+          addHistory(email, 'Mot de passe réinitialisé');
+          alert('Mot de passe réinitialisé.');
+        }
+      } else if (action === 'suspend') {
+        let suspended = getSuspended();
+        if (suspended.includes(email)) {
+          suspended = suspended.filter(e => e !== email);
+          addHistory(email, 'Compte réactivé');
+        } else {
+          suspended.push(email);
+          addHistory(email, 'Compte suspendu');
+        }
+        saveSuspended(suspended);
+      } else if (action === 'history') {
+        const h = getHistory()[email] || [];
+        alert(h.length ? h.map(x => x.date + ' — ' + x.action).join('\n') : 'Aucun historique.');
+      } else if (action === 'delete') {
+        if (confirm('Supprimer le compte ' + email + ' ?')) {
+          delete accounts[email];
+          saveAccounts(accounts);
+          let suspended = getSuspended().filter(e => e !== email);
+          saveSuspended(suspended);
+          addHistory(email, 'Compte supprimé');
+        }
+      }
+      loadAdminData();
+    }
 
     document.getElementById('addUserBtn').onclick = () => {
       const email = document.getElementById('newUserEmail').value.trim().toLowerCase();
@@ -878,12 +945,21 @@
     };
     setupToggle('toggleNewUserPass', 'newUserPass');
 
-    document.getElementById('resetAppData').onclick = () => {
-      if (confirm('Réinitialiser toutes les données de l’application (comptes + préférences) ?')) {
-        localStorage.clear();
-        alert('Application réinitialisée. Recharge la page.');
-        location.reload();
+    document.getElementById('clearAllAccounts').onclick = () => {
+      if (confirm('Supprimer tous les comptes ?')) {
+        localStorage.removeItem('videoprivee_accounts');
+        loadAdminData();
+        alert('Tous les comptes ont été supprimés.');
       }
+    };
+    document.getElementById('suspendAllBtn').onclick = () => {
+      const accounts = getAccounts();
+      const emails = Object.keys(accounts);
+      if (emails.length === 0) return alert('Aucun compte.');
+      saveSuspended(emails);
+      emails.forEach(e => addHistory(e, 'Suspendu (tous)'));
+      loadAdminData();
+      alert('Tous les comptes sont suspendus.');
     };
 
     // Profils par plateforme
@@ -1571,15 +1647,6 @@
         return;
       }
       result.innerHTML = `Lien reçu : <strong>${url}</strong><br>Pour rester 100 % privé, ouvre le lien manuellement dans un nouvel onglet, télécharge la vidéo, puis reviens ici pour la partager.`;
-    };
-
-    // Admin : remettre le bouton clear
-    document.getElementById('clearAllAccounts').onclick = () => {
-      if (confirm('Effacer tous les comptes enregistrés ?')) {
-        localStorage.removeItem('videoprivee_accounts');
-        loadAdminData();
-        alert('Tous les comptes ont été effacés.');
-      }
     };
 
     // Nettoyage au chargement
