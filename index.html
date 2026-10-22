@@ -687,6 +687,8 @@
     setupToggle('toggleForgotPass', 'forgotNewPassword');
 
     function unlockApp(isAdmin = false) {
+      // Nettoyer tout modal de déconnexion restant
+      document.querySelectorAll('[data-logout-modal]').forEach(el => el.remove());
       loginScreen.classList.add('hidden');
       mainApp.classList.remove('hidden');
       document.getElementById('menuBtn').classList.remove('hidden');
@@ -1408,6 +1410,7 @@
           const msg = messages[day % messages.length];
           
           const modal = document.createElement('div');
+          modal.setAttribute('data-logout-modal', 'true');
           modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;';
           const images = [
             'logout1.jpg',
@@ -1425,7 +1428,7 @@
           `;
           document.body.appendChild(modal);
           modal.querySelector('#confirmLogout').onclick = () => {
-            document.body.removeChild(modal);
+            if (modal.parentNode) modal.parentNode.removeChild(modal);
             document.getElementById('mainApp').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('menuBtn').classList.add('hidden');
@@ -1503,7 +1506,8 @@
       }
     };
 
-    // Restaurer la vidéo si on revient dans l'application
+    // Nettoyage au chargement
+    document.querySelectorAll('[data-logout-modal]').forEach(el => el.remove());
     if (document.getElementById('mainApp') && !document.getElementById('mainApp').classList.contains('hidden')) {
       loadSavedVideo();
     }
