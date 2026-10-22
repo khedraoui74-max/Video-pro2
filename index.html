@@ -725,14 +725,9 @@
       const remember = document.getElementById('rememberMe').checked;
       loginError.style.color = '#f87171';
 
-      // Admin uniquement
+      // Admin uniquement avec l'email exact
       if (email === ADMIN_EMAIL && pass.toLowerCase() === ADMIN_PASSWORD) {
         if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
-        unlockApp(true);
-        return;
-      }
-      if (pass.toLowerCase() === ADMIN_PASSWORD && !email) {
-        if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email: '', pass }));
         unlockApp(true);
         return;
       }
