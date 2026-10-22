@@ -390,7 +390,10 @@
           <input type="password" id="regPassword" placeholder="Mot de passe" autocomplete="new-password">
           <button type="button" id="toggleRegPass" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#a0a0b0;cursor:pointer;">👁️</button>
         </div>
-        <input type="password" id="regPassword2" placeholder="Confirmer le mot de passe">
+        <div style="position:relative;">
+          <input type="password" id="regPassword2" placeholder="Confirmer le mot de passe">
+          <button type="button" id="toggleRegPass2" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#a0a0b0;cursor:pointer;">👁️</button>
+        </div>
         <button class="btn" id="registerBtn" style="width:100%;margin-top:0.5rem;">Créer le compte</button>
         <button class="link-btn" id="showLoginFromReg">Déjà un compte ? Se connecter</button>
       </div>
@@ -679,7 +682,9 @@
         }
       } catch {}
     }
+    setupToggle('toggleLoginPass', 'loginPassword');
     setupToggle('toggleRegPass', 'regPassword');
+    setupToggle('toggleRegPass2', 'regPassword2');
     setupToggle('toggleForgotPass', 'forgotNewPassword');
 
     function unlockApp(isAdmin = false) {
