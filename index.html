@@ -1121,7 +1121,10 @@
     };
 
     downloadBtn.onclick = () => {
-      if (!currentFile) return;
+      if (!currentFile) {
+        alert('Aucune vidéo chargée.');
+        return;
+      }
       const baseName = currentFile.name.replace(/\.[^/.]+$/, '');
       const currentExt = (currentFile.name.split('.').pop() || 'mp4').toLowerCase();
       const newTitle = prompt('Nouveau titre de la vidéo :', baseName);
@@ -1129,10 +1132,14 @@
       const newFormat = prompt('Nouveau format (mp4, mov, webm, mkv, avi...) :', currentExt);
       if (newFormat === null) return;
       const finalName = (newTitle.trim() || baseName) + '.' + (newFormat.trim().toLowerCase() || currentExt);
+      const url = URL.createObjectURL(currentFile);
       const a = document.createElement('a');
-      a.href = objectUrl;
+      a.href = url;
       a.download = finalName;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
       status.innerHTML = `<span class="success">Téléchargement lancé : ${finalName}</span>`;
     };
     const mainDownloadBtn = document.getElementById('mainDownloadBtn');
@@ -1146,10 +1153,14 @@
         const newFormat = prompt('Nouveau format (mp4, mov, webm, mkv, avi...) :', currentExt);
         if (newFormat === null) return;
         const finalName = (newTitle.trim() || baseName) + '.' + (newFormat.trim().toLowerCase() || currentExt);
+        const url = URL.createObjectURL(currentFile);
         const a = document.createElement('a');
-        a.href = objectUrl;
+        a.href = url;
         a.download = finalName;
+        document.body.appendChild(a);
         a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       };
     }
 
