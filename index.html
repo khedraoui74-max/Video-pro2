@@ -438,6 +438,7 @@
     </select>
     <button id="managePassword">Changer le mot de passe</button>
     <button id="manageProfiles">Gérer les profils</button>
+    <button id="openAdminPanel" class="hidden">Panneau Administrateur</button>
     <button id="showHelp">Comment utiliser l’application</button>
     <button id="closeMenu" style="margin-top:2rem;background:var(--accent);">Fermer</button>
   </div>
@@ -1385,8 +1386,17 @@
         });
       }
 
-      // Profils
-      const manageProfiles = document.getElementById('manageProfiles');
+      const openAdmin = document.getElementById('openAdminPanel');
+      if (openAdmin) {
+        openAdmin.addEventListener('click', () => {
+          const panel = document.getElementById('adminPanel');
+          if (panel) {
+            panel.classList.remove('hidden');
+            panel.scrollIntoView({ behavior: 'smooth' });
+          }
+          closeSidebar();
+        });
+      }
       const profilesModal = document.getElementById('profilesModal');
       const closeProfiles = document.getElementById('closeProfiles');
       if (manageProfiles && profilesModal) {
