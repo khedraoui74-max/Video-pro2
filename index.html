@@ -437,7 +437,7 @@
       <option value="ar">العربية (فلسطينية)</option>
     </select>
     <button id="managePassword">Changer le mot de passe</button>
-    <button id="manageProfiles">Gérer les profils</button>
+    <button id="manageProfiles">Gérer les profils des réseaux sociaux</button>
     <button id="openAdminPanel" class="hidden">Panneau Administrateur</button>
     <button id="showHelp">Comment utiliser l’application</button>
     <button id="closeMenu" style="margin-top:2rem;background:var(--accent);">Fermer</button>
@@ -490,7 +490,7 @@
   <div id="profilesModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:400;display:flex;align-items:center;justify-content:center;padding:1rem;">
     <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:500px;width:100%;padding:1.5rem;position:relative;">
       <button id="closeProfiles" style="position:absolute;top:0.6rem;right:0.6rem;background:rgba(0,0,0,0.4);border:none;color:white;font-size:1.6rem;width:40px;height:40px;border-radius:50%;cursor:pointer;z-index:10;">✕</button>
-      <h2 style="margin-top:0;">Gérer les profils</h2>
+      <h2 style="margin-top:0;">Gérer les profils des réseaux sociaux</h2>
       <p style="color:var(--muted);font-size:0.9rem;">Ajoute les noms de tes comptes pour chaque plateforme.</p>
       <label style="display:block;margin:0.8rem 0 0.3rem;">Plateforme</label>
       <select id="profilePlatform" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;">
@@ -504,6 +504,24 @@
         <option value="Telegram">Telegram</option>
         <option value="Discord">Discord</option>
         <option value="Reddit">Reddit</option>
+        <option value="LinkedIn">LinkedIn</option>
+        <option value="Pinterest">Pinterest</option>
+        <option value="Twitch">Twitch</option>
+        <option value="VK">VK</option>
+        <option value="WeChat">WeChat</option>
+        <option value="Line">Line</option>
+        <option value="Viber">Viber</option>
+        <option value="Signal">Signal</option>
+        <option value="Threads">Threads</option>
+        <option value="Bluesky">Bluesky</option>
+        <option value="Mastodon">Mastodon</option>
+        <option value="Tumblr">Tumblr</option>
+        <option value="Dailymotion">Dailymotion</option>
+        <option value="Vimeo">Vimeo</option>
+        <option value="Kwai">Kwai</option>
+        <option value="Likee">Likee</option>
+        <option value="Rumble">Rumble</option>
+        <option value="Odysee">Odysee</option>
       </select>
       <label style="display:block;margin:0.8rem 0 0.3rem;">Nom du profil <span id="profileCount" style="color:var(--muted);font-size:0.8rem;">(0/20)</span></label>
       <input type="text" id="profileName" placeholder="ex. moncompte" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;">
@@ -1430,7 +1448,7 @@
           remove: 'Retirer cette vidéo',
           removeNet: 'Retirer des réseaux',
           share: 'Partager sur',
-          profiles: 'Gérer les profils',
+          profiles: 'Gérer les profils des réseaux sociaux',
           help: 'Comment utiliser l’application',
           close: 'Fermer',
           themeDay: 'Mode jour',
