@@ -1161,36 +1161,24 @@
     }
 
     document.getElementById('confirmShareBtn').onclick = async () => {
+      if (!currentFile) return alert('Charge d’abord une vidéo.');
       const selected = Array.from(platformsDiv.querySelectorAll('input:checked')).map(cb => cb.value);
       if (selected.length === 0) return alert('Sélectionne au moins un réseau.');
 
-      const allProfiles = getProfiles();
-      const choices = {};
-
-      for (const name of selected) {
-        const platformProfiles = allProfiles[name] || [];
-        if (platformProfiles.length === 0) {
-          choices[name] = [];
-          continue;
-        }
-        const picked = await showProfileSelector(name, platformProfiles);
-        if (picked === null) return; // annulé
-        choices[name] = picked;
-      }
-
-      // Ouvrir les réseaux sélectionnés
-      for (const name of selected) {
-        const p = platforms.find(x => x.name === name);
-        if (p) {
-          setTimeout(() => window.open(p.url, '_blank'), 200);
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [currentFile] })) {
+        try {
+          await navigator.share({
+            files: [currentFile],
+            title: currentFile.name,
+            text: 'Vidéo partagée via VidéoPrivée'
+          });
+          status.innerHTML = '<span class="success">Vidéo envoyée !</span>';
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
         }
       }
-
-      let summary = 'Réseaux ouverts :<br>';
-      for (const [net, profs] of Object.entries(choices)) {
-        summary += `<strong>${net}</strong> : ${profs.length ? profs.join(', ') : 'aucun profil'}<br>`;
-      }
-      status.innerHTML = summary;
+      alert('Ton navigateur ne permet pas le partage direct. Ouvre l’application du réseau et charge la vidéo manuellement.');
     };
 
     async function shareTo(platform) {
