@@ -1691,7 +1691,7 @@
       ];
       let html = '<div style="background:rgba(34,197,94,0.1);padding:0.8rem;border-radius:8px;"><strong>Choisis un service :</strong><br>';
       services.forEach(s => {
-        html += `<a href="${s.url}" target="_blank" class="btn" style="display:block;margin-top:0.4rem;text-align:center;text-decoration:none;">⬇️ ${s.name}</a>`;
+        html += `<a href="${s.url}" target="_blank" rel="noopener" class="btn" style="display:block;margin-top:0.4rem;text-align:center;text-decoration:none;">⬇️ ${s.name}</a>`;
       });
       html += '</div>';
       result.innerHTML = html;
