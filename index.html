@@ -556,7 +556,7 @@
 
     <div class="card">
       <h3>Extraire une vidéo depuis un lien</h3>
-      <p style="color:var(--muted);font-size:0.9rem;">Colle un lien. L’application t’aide à l’ouvrir pour télécharger la vidéo manuellement (100 % privé, aucun serveur).</p>
+      <p style="color:var(--muted);font-size:0.9rem;">Colle un lien TikTok, Instagram, YouTube, etc. La vidéo sera récupérée automatiquement.</p>
       <input type="url" id="extractUrl" placeholder="https://..." style="width:100%;padding:0.8rem;margin:0.5rem 0;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;">
       <button class="btn" id="extractBtn">Préparer le lien</button>
       <div id="extractResult" style="margin-top:0.8rem;font-size:0.9rem;color:var(--muted);"></div>
@@ -1677,22 +1677,41 @@
     }
 
     // Extraction de lien (placeholder privé)
-    document.getElementById('extractBtn').onclick = () => {
+    document.getElementById('extractBtn').onclick = async () => {
       const url = document.getElementById('extractUrl').value.trim();
       const result = document.getElementById('extractResult');
       if (!url || !url.startsWith('http')) {
         result.innerHTML = '<span style="color:#f87171">Entre un lien valide (https://...).</span>';
         return;
       }
-      result.innerHTML = `
-        <div style="background:rgba(124,92,255,0.1);padding:0.8rem;border-radius:8px;">
-          <strong>Lien détecté</strong><br>
-          <a href="${url}" target="_blank" style="color:var(--accent);word-break:break-all;">${url}</a>
-          <p style="margin:0.6rem 0 0;font-size:0.85rem;">
-            Ouvre le lien, télécharge la vidéo depuis la plateforme, puis reviens ici pour la charger.
-          </p>
-          <button class="btn" style="margin-top:0.6rem;" onclick="window.open('${url}','_blank')">Ouvrir le lien</button>
-        </div>`;
+      result.innerHTML = '<span style="color:var(--muted)">Récupération de la vidéo...</span>';
+      try {
+        const resp = await fetch('https://api.cobalt.tools/api/json', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: url })
+        });
+        const data = await resp.json();
+        if (data.status === 'stream' || data.status === 'redirect') {
+          const videoUrl = data.url;
+          result.innerHTML = `
+            <div style="background:rgba(34,197,94,0.1);padding:0.8rem;border-radius:8px;">
+              <strong>Vidéo trouvée</strong>
+              <a href="${videoUrl}" download class="btn" style="display:block;margin-top:0.6rem;text-align:center;text-decoration:none;">⬇️ Télécharger la vidéo</a>
+            </div>`;
+        } else if (data.status === 'picker' && data.picker) {
+          let html = '<div style="background:rgba(124,92,255,0.1);padding:0.8rem;border-radius:8px;"><strong>Choisis une vidéo :</strong><br>';
+          data.picker.forEach((item, i) => {
+            html += `<a href="${item.url}" download class="btn" style="display:block;margin-top:0.4rem;text-align:center;text-decoration:none;">Option ${i+1}</a>`;
+          });
+          html += '</div>';
+          result.innerHTML = html;
+        } else {
+          result.innerHTML = '<span style="color:#f87171">Impossible de récupérer cette vidéo. Essaie un autre lien.</span>';
+        }
+      } catch (e) {
+        result.innerHTML = '<span style="color:#f87171">Erreur de connexion. Réessaie.</span>';
+      }
     };
 
     // Nettoyage au chargement
