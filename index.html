@@ -562,28 +562,31 @@
       <div id="extractResult" style="margin-top:0.8rem;font-size:0.9rem;color:var(--muted);"></div>
     </div>
 
-    <div class="card hidden" id="adminPanel">
-      <h3>Panneau Administrateur</h3>
-      <p style="color:var(--muted);font-size:0.9rem;">Contrôle complet — drive.ia01@outlook.com</p>
-      
-      <div style="margin:1rem 0;">
-        <strong>Ajouter un utilisateur</strong>
-        <div style="margin-top:0.6rem;">
-          <input type="email" id="newUserEmail" placeholder="E-mail" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;margin-bottom:0.4rem;">
-          <div style="position:relative;">
-            <input type="password" id="newUserPass" placeholder="Mot de passe" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;">
-            <button type="button" id="toggleNewUserPass" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#a0a0b0;cursor:pointer;">👁️</button>
+    <div class="card hidden" id="adminPanel" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:400;display:flex;align-items:center;justify-content:center;padding:1rem;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;padding:1.5rem;position:relative;">
+        <button id="closeAdmin" style="position:absolute;top:0.6rem;right:0.6rem;background:rgba(0,0,0,0.4);border:none;color:white;font-size:1.6rem;width:40px;height:40px;border-radius:50%;cursor:pointer;">✕</button>
+        <h2 style="margin-top:0;">Panneau Administrateur</h2>
+        <p style="color:var(--muted);font-size:0.9rem;">Contrôle complet — drive.ia01@outlook.com</p>
+        
+        <div style="margin:1rem 0;">
+          <strong>Ajouter un utilisateur</strong>
+          <div style="margin-top:0.6rem;">
+            <input type="email" id="newUserEmail" placeholder="E-mail" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;margin-bottom:0.4rem;">
+            <div style="position:relative;">
+              <input type="password" id="newUserPass" placeholder="Mot de passe" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;">
+              <button type="button" id="toggleNewUserPass" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#a0a0b0;cursor:pointer;">👁️</button>
+            </div>
+            <button class="btn" id="addUserBtn" style="width:100%;margin-top:0.6rem;">Créer le compte</button>
           </div>
-          <button class="btn" id="addUserBtn" style="width:100%;margin-top:0.6rem;">Créer le compte</button>
         </div>
-      </div>
 
-      <div style="margin:1rem 0;">
-        <strong>Comptes enregistrés</strong>
-        <div id="adminAccounts" style="margin:0.5rem 0;font-size:0.9rem;"></div>
-        <div class="actions">
-          <button class="btn btn-secondary" id="clearAllAccounts" style="border-color:#f87171;color:#f87171;">Supprimer tous les comptes</button>
-          <button class="btn btn-secondary" id="suspendAllBtn" style="border-color:#fbbf24;color:#fbbf24;">Suspendre tous</button>
+        <div style="margin:1rem 0;">
+          <strong>Comptes enregistrés</strong>
+          <div id="adminAccounts" style="margin:0.5rem 0;font-size:0.9rem;max-height:250px;overflow-y:auto;"></div>
+          <div class="actions">
+            <button class="btn btn-secondary" id="clearAllAccounts" style="border-color:#f87171;color:#f87171;">Supprimer tous les comptes</button>
+            <button class="btn btn-secondary" id="suspendAllBtn" style="border-color:#fbbf24;color:#fbbf24;">Suspendre tous</button>
+          </div>
         </div>
       </div>
     </div>
@@ -737,9 +740,8 @@
       if (typeof initMenu === 'function') initMenu();
       showDailyQuote();
       if (isAdmin) {
-        const panel = document.getElementById('adminPanel');
-        if (panel) panel.classList.remove('hidden');
-        loadAdminData();
+        const adminBtn = document.getElementById('openAdminPanel');
+        if (adminBtn) adminBtn.classList.remove('hidden');
       }
       loadSavedVideo();
     }
@@ -1410,9 +1412,15 @@
           const panel = document.getElementById('adminPanel');
           if (panel) {
             panel.classList.remove('hidden');
-            panel.scrollIntoView({ behavior: 'smooth' });
+            loadAdminData();
           }
           closeSidebar();
+        });
+      }
+      const closeAdmin = document.getElementById('closeAdmin');
+      if (closeAdmin) {
+        closeAdmin.addEventListener('click', () => {
+          document.getElementById('adminPanel').classList.add('hidden');
         });
       }
       const profilesModal = document.getElementById('profilesModal');
