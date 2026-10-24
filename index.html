@@ -1684,13 +1684,17 @@
         result.innerHTML = '<span style="color:#f87171">Entre un lien valide (https://...).</span>';
         return;
       }
-      const cobaltUrl = 'https://cobalt.meowing.de/?u=' + encodeURIComponent(url);
-      result.innerHTML = `
-        <div style="background:rgba(34,197,94,0.1);padding:0.8rem;border-radius:8px;">
-          <strong>Lien prêt</strong>
-          <p style="margin:0.4rem 0;font-size:0.85rem;">Clique pour télécharger la vidéo :</p>
-          <a href="${cobaltUrl}" target="_blank" class="btn" style="display:block;text-align:center;text-decoration:none;">⬇️ Télécharger la vidéo</a>
-        </div>`;
+      const services = [
+        { name: 'Cobalt', url: 'https://cobalt.meowing.de/?u=' + encodeURIComponent(url) },
+        { name: 'Y2Mate', url: 'https://www.y2mate.com/fr/search/' + encodeURIComponent(url) },
+        { name: 'SaveFrom', url: 'https://fr.savefrom.net/' + encodeURIComponent(url) }
+      ];
+      let html = '<div style="background:rgba(34,197,94,0.1);padding:0.8rem;border-radius:8px;"><strong>Choisis un service :</strong><br>';
+      services.forEach(s => {
+        html += `<a href="${s.url}" target="_blank" class="btn" style="display:block;margin-top:0.4rem;text-align:center;text-decoration:none;">⬇️ ${s.name}</a>`;
+      });
+      html += '</div>';
+      result.innerHTML = html;
     };
 
     // Nettoyage au chargement
