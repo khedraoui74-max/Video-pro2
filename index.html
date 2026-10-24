@@ -615,9 +615,9 @@
       <div class="status" id="status"></div>
     </div>
 
-    <div class="card" id="shareCard" style="display: none;">
+    <div class="card" id="shareCard">
       <h3>Partager sur les plateformes</h3>
-      <p style="color: var(--muted); font-size: 0.9rem;">Coche les réseaux, puis choisis les profils pour chacun.</p>
+      <p style="color: var(--muted); font-size: 0.9rem;">Charge une vidéo, coche les réseaux, puis choisis les profils (jusqu’à 20 par réseau).</p>
       <div class="platforms" id="platforms"></div>
       <button class="btn" id="confirmShareBtn" style="margin-top:1rem;width:100%;">Continuer avec la sélection</button>
     </div>
@@ -1073,7 +1073,8 @@
       fileInput.value = '';
       fileInput.click();
     });
-    dropzone.addEventListener('click', (e) => {
+    // Afficher les plateformes dès le départ
+    // (appelé après la définition de renderPlatforms)
       if (e.target.id !== 'selectFileBtn') {
         fileInput.value = '';
         fileInput.click();
@@ -1159,6 +1160,7 @@
         platformsDiv.appendChild(label);
       });
     }
+    renderPlatforms();
 
     document.getElementById('confirmShareBtn').onclick = async () => {
       if (!currentFile) return alert('Charge d’abord une vidéo.');
