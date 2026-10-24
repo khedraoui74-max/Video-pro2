@@ -755,7 +755,7 @@
       loginError.style.color = '#f87171';
 
       // Admin uniquement avec l'email exact
-      if (email === ADMIN_EMAIL && pass.toLowerCase() === ADMIN_PASSWORD) {
+      if (email === 'drive.ia01@outlook.com' && (pass.toLowerCase() === 'prive' || pass === 'prive')) {
         if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
         unlockApp(true);
         return;
@@ -770,6 +770,10 @@
         }
         if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
         unlockApp(email === ADMIN_EMAIL);
+        return;
+      }
+      if (email === 'drive.ia01@outlook.com' && pass.toLowerCase() !== 'prive') {
+        loginError.textContent = 'Mot de passe incorrect pour l’administrateur';
         return;
       }
       loginError.textContent = 'E-mail ou mot de passe incorrect';
