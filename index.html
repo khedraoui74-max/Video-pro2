@@ -1085,8 +1085,10 @@
     fileInput.addEventListener('change', (e) => { if (e.target.files.length) handleFile(e.target.files[0]); });
 
     function handleFile(file) {
-      if (!file.type.startsWith('video/') && !file.name.match(/\.(mp4|mov|avi|mkv|webm|wmv|flv|m4v)$/i)) {
-        status.innerHTML = '<span style="color:#f87171">Veuillez sélectionner un fichier vidéo.</span>';
+      if (!file) return;
+      const isVideo = file.type.startsWith('video/') || file.name.match(/\.(mp4|mov|avi|mkv|webm|wmv|flv|m4v|3gp)$/i);
+      if (!isVideo) {
+        alert('Sélectionne un fichier vidéo (MP4, MOV, etc.)');
         return;
       }
 
@@ -1134,9 +1136,10 @@
         <div class="info-item"><strong>Type</strong>${file.type || 'Inconnu'}</div>
         <div class="info-item"><strong>Format</strong>${file.name.split('.').pop().toUpperCase()}</div>
       `;
-      status.innerHTML = '<span class="success" style="font-size:1.05rem;font-weight:600;">✅ Vidéo chargée ! Elle est prête à partager.</span>';
+      status.innerHTML = '<span class="success" style="font-size:1.05rem;font-weight:600;">✅ Vidéo chargée ! Sélectionne les réseaux ci-dessous.</span>';
       document.getElementById('mainDownloadBtn').style.display = 'inline-block';
       renderPlatforms();
+      shareCard.scrollIntoView({ behavior: 'smooth' });
     }
 
     function renderPlatforms() {
