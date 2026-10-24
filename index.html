@@ -556,7 +556,7 @@
 
     <div class="card">
       <h3>Extraire une vidéo depuis un lien</h3>
-      <p style="color:var(--muted);font-size:0.9rem;">Colle un lien TikTok, Instagram, YouTube, etc. La vidéo sera récupérée automatiquement.</p>
+      <p style="color:var(--muted);font-size:0.9rem;">Colle un lien TikTok, Instagram, YouTube, etc. Choisis un service pour télécharger.</p>
       <input type="url" id="extractUrl" placeholder="https://..." style="width:100%;padding:0.8rem;margin:0.5rem 0;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;">
       <button class="btn" id="extractBtn">Préparer le lien</button>
       <div id="extractResult" style="margin-top:0.8rem;font-size:0.9rem;color:var(--muted);"></div>
@@ -597,11 +597,12 @@
           <div style="font-size: 3rem;">🎬</div>
           <p><strong>Glisse-dépose ta vidéo ici</strong></p>
           <p>ou clique pour choisir un fichier</p>
-          <p style="font-size: 0.85rem;">Tous formats acceptés (MP4, MOV, AVI, MKV, WebM, etc.)</p>
+          <button type="button" class="btn" id="selectFileBtn" style="margin-top:0.8rem;">📁 Choisir dans mes fichiers</button>
+          <p style="font-size: 0.85rem;margin-top:0.5rem;">Tous formats acceptés (MP4, MOV, AVI, MKV, WebM, etc.)</p>
         </div>
         <video id="dropzoneVideo" controls style="display:none;width:100%;max-height:300px;border-radius:8px;"></video>
       </div>
-      <input type="file" id="fileInput" accept="video/*,.mkv,.avi,.mov,.wmv,.flv">
+      <input type="file" id="fileInput" accept="video/*,.mp4,.mov,.avi,.mkv,.webm,.wmv,.flv,.m4v" style="display:none;">
     </div>
 
     <div class="card" id="previewCard" style="display: none;">
@@ -1062,7 +1063,18 @@
       { name: 'Reddit', icon: '🔴', url: 'https://www.reddit.com/submit' }
     ];
 
-    dropzone.addEventListener('click', () => fileInput.click());
+    document.getElementById('selectFileBtn')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      fileInput.value = '';
+      fileInput.click();
+    });
+    dropzone.addEventListener('click', (e) => {
+      if (e.target.id !== 'selectFileBtn') {
+        fileInput.value = '';
+        fileInput.click();
+      }
+    });
     dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
     dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
     dropzone.addEventListener('drop', (e) => {
@@ -1677,19 +1689,26 @@
     }
 
     // Extraction de lien (placeholder privé)
-    document.getElementById('extractBtn').onclick = () => {
+    document.getElementById('extractBtn').onclick = async () => {
       const url = document.getElementById('extractUrl').value.trim();
       const result = document.getElementById('extractResult');
       if (!url || !url.startsWith('http')) {
         result.innerHTML = '<span style="color:#f87171">Entre un lien valide (https://...).</span>';
         return;
       }
+      result.innerHTML = '<span style="color:var(--muted)">Préparation du téléchargement...</span>';
+      
       const services = [
         { name: 'Cobalt', url: 'https://cobalt.meowing.de/?u=' + encodeURIComponent(url) },
-        { name: 'Y2Mate', url: 'https://www.y2mate.com/fr/search/' + encodeURIComponent(url) },
-        { name: 'SaveFrom', url: 'https://fr.savefrom.net/' + encodeURIComponent(url) }
+        { name: 'SnapTik (TikTok)', url: 'https://snaptik.app/?url=' + encodeURIComponent(url) },
+        { name: 'SSSTikTok', url: 'https://ssstik.io/?url=' + encodeURIComponent(url) },
+        { name: 'Y2Mate (YouTube)', url: 'https://www.y2mate.com/youtube/' + encodeURIComponent(url) },
+        { name: 'SaveFrom', url: 'https://en.savefrom.net/' + encodeURIComponent(url) }
       ];
-      let html = '<div style="background:rgba(34,197,94,0.1);padding:0.8rem;border-radius:8px;"><strong>Choisis un service :</strong><br>';
+      
+      let html = '<div style="background:rgba(34,197,94,0.1);padding:0.8rem;border-radius:8px;">';
+      html += '<strong>Télécharge la vidéo :</strong><br>';
+      html += '<p style="font-size:0.8rem;color:var(--muted);margin:0.4rem 0;">Le fichier ira dans tes Téléchargements.</p>';
       services.forEach(s => {
         html += `<a href="${s.url}" target="_blank" rel="noopener" class="btn" style="display:block;margin-top:0.4rem;text-align:center;text-decoration:none;">⬇️ ${s.name}</a>`;
       });
