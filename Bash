@@ -1,0 +1,6 @@
+git clone https://github.com/Driveia01-web/AtelierCode.git
+cd AtelierCode
+# copiez les fichiers android-app ici
+git add .
+git commit -m "Add Android project"
+git push
