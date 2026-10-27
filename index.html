@@ -544,8 +544,15 @@
       <h3>Installer l’application</h3>
       <p style="color:var(--muted);font-size:0.9rem;">Installe VidéoPrivée sur ton téléphone pour y accéder comme une application.</p>
       <a href="https://videopro2.vercel.app/" class="btn" style="display:inline-block;margin-top:0.5rem;text-decoration:none;">⬇️ Version Web / PWA</a>
-      <a href="https://www.pwabuilder.com/?url=https://videopro2.vercel.app/" target="_blank" class="btn" style="display:inline-block;margin-top:0.5rem;text-decoration:none;background:#22c55e;">⬇️ Télécharger APK (Android)</a>
-      <p style="font-size:0.85rem;margin-top:0.8rem;">Clique pour générer et télécharger l’APK Android.</p>
+      <button class="btn" id="downloadApk" style="margin-top:0.5rem;background:#22c55e;border:none;">⬇️ Télécharger APK (Android)</button>
+      <div style="font-size:0.85rem;margin-top:0.8rem;color:var(--muted);line-height:1.6;">
+        <strong>Comment obtenir l’APK :</strong><br>
+        1. Clique sur le bouton ci-dessus<br>
+        2. Le lien est copié automatiquement<br>
+        3. PWABuilder s’ouvre → colle le lien dans le champ<br>
+        4. Clique sur <strong>Start</strong><br>
+        5. Choisis <strong>Android</strong> → télécharge l’APK
+      </div>
     </div>
 
     <div class="card">
@@ -1714,7 +1721,29 @@
       result.innerHTML = html;
     };
 
-    // Nettoyage au chargement
+    document.getElementById('downloadApk')?.addEventListener('click', () => {
+      const url = 'https://videopro2.vercel.app';
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;';
+      modal.innerHTML = `
+        <div style="background:var(--card);border-radius:16px;padding:1.5rem;max-width:400px;border:1px solid var(--border);">
+          <h3 style="margin-top:0;">Télécharger l’APK</h3>
+          <ol style="text-align:left;line-height:1.6;font-size:0.9rem;">
+            <li>Le lien sera copié automatiquement</li>
+            <li>PWABuilder s’ouvrira</li>
+            <li>Colle le lien dans le champ</li>
+            <li>Clique sur <strong>Start</strong></li>
+            <li>Choisis <strong>Android</strong> → télécharge</li>
+          </ol>
+          <button class="btn" id="confirmApk" style="width:100%;margin-top:0.5rem;">Continuer</button>
+        </div>`;
+      document.body.appendChild(modal);
+      modal.querySelector('#confirmApk').onclick = () => {
+        navigator.clipboard.writeText(url).catch(() => {});
+        window.open('https://www.pwabuilder.com/', '_blank');
+        modal.remove();
+      };
+    });
     document.querySelectorAll('[data-logout-modal]').forEach(el => el.remove());
     if (document.getElementById('mainApp') && !document.getElementById('mainApp').classList.contains('hidden')) {
       loadSavedVideo();
