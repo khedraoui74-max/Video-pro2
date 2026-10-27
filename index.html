@@ -643,15 +643,15 @@
 
     // Citations
     const quotes = [
-      { text: "Et Nous avons certes honoré les fils d'Adam...", source: "Coran 17:70" },
+      { text: "Et Nous avons certes honore les fils d Adam...", source: "Coran 17:70" },
       { text: "Dieu est amour.", source: "Bible - 1 Jean 4:8" },
-      { text: "Tu aimeras ton prochain comme toi-même.", source: "Torah - Lévitique 19:18" },
-      { text: "Certes, avec la difficulté il y a une facilité.", source: "Coran 94:5-6" },
-      { text: "Tout ce que vous voulez que les hommes fassent pour vous, faites-le de même pour eux.", source: "Bible - Matthieu 7:12" },
-      { text: "Écoute, Israël : l'Éternel, notre Dieu, est le seul Éternel.", source: "Torah - Deutéronome 6:4" },
-      { text: "Heureux les artisans de paix, car ils seront appelés fils de Dieu.", source: "Bible - Matthieu 5:9" },
+      { text: "Tu aimeras ton prochain comme toi-meme.", source: "Torah - Levitique 19:18" },
+      { text: "Certes, avec la difficulte il y a une facilite.", source: "Coran 94:5-6" },
+      { text: "Tout ce que vous voulez que les hommes fassent pour vous, faites-le de meme pour eux.", source: "Bible - Matthieu 7:12" },
+      { text: "Ecoute, Israel : l Eternel, notre Dieu, est le seul Eternel.", source: "Torah - Deuteronome 6:4" },
+      { text: "Heureux les artisans de paix, car ils seront appeles fils de Dieu.", source: "Bible - Matthieu 5:9" },
       { text: "Tu ne tueras point.", source: "Torah - Exode 20:13" },
-      { text: "La patience est une lumière.", source: "Coran (Hadith)" },
+      { text: "La patience est une lumiere.", source: "Coran (Hadith)" },
       { text: "Je puis tout par celui qui me fortifie.", source: "Bible - Philippiens 4:13" }
     ];
 
@@ -1075,6 +1075,7 @@
     });
     // Afficher les plateformes dès le départ
     // (appelé après la définition de renderPlatforms)
+    dropzone.addEventListener('click', (e) => {
       if (e.target.id !== 'selectFileBtn') {
         fileInput.value = '';
         fileInput.click();
