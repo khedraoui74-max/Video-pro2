@@ -457,7 +457,7 @@
           <li><strong>Nouveau</strong> : « Créer un compte » → e-mail + mot de passe (min. 4 caractères).</li>
           <li><strong>Déjà un compte</strong> : entre e-mail + mot de passe → « Se connecter ».</li>
           <li><strong>Mot de passe oublié</strong> : clique sur le lien → e-mail + nouveau mot de passe.</li>
-          <li><strong>Accès rapide</strong> : laisse l’e-mail vide et entre un code maître (<code>hessus</code>, <code>hessuusssss</code>, <code>master</code>, <code>prive</code> ou <code>video123</code>).</li>
+          <li><strong>Accès rapide</strong> : contacte l’administrateur.</li>
         </ul>
         <p>Tout est stocké uniquement dans ton navigateur.</p>
 
@@ -645,8 +645,8 @@
   <script>
     // Compte administrateur principal
     const ADMIN_EMAIL = 'drive.ia01@outlook.com';
-    const ADMIN_PASSWORD = 'prive';
-    const MASTER_CODES = ['prive'];
+    const ADMIN_HASH = 'c3RyaW5n'; // hash simple
+    function checkAdmin(pass) { return btoa(pass) === 'cHJpdmU='; }
 
     // Citations
     const quotes = [
@@ -762,7 +762,7 @@
       loginError.style.color = '#f87171';
 
       // Admin uniquement avec l'email exact
-      if (email === 'drive.ia01@outlook.com' && (pass.toLowerCase() === 'prive' || pass === 'prive')) {
+      if (email === ADMIN_EMAIL && checkAdmin(pass)) {
         if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
         unlockApp(true);
         return;
@@ -779,7 +779,7 @@
         unlockApp(email === ADMIN_EMAIL);
         return;
       }
-      if (email === 'drive.ia01@outlook.com' && pass.toLowerCase() !== 'prive') {
+      if (email === ADMIN_EMAIL && !checkAdmin(pass)) {
         loginError.textContent = 'Mot de passe incorrect pour l’administrateur';
         return;
       }
