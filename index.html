@@ -608,6 +608,7 @@
           <p style="font-size: 0.85rem;margin-top:0.5rem;">Tous formats acceptés (MP4, MOV, AVI, MKV, WebM, etc.)</p>
         </div>
         <video id="dropzoneVideo" controls style="display:none;width:100%;max-height:300px;border-radius:8px;"></video>
+        <img id="videoThumb" style="display:none;width:100%;max-height:200px;border-radius:8px;margin-top:0.5rem;object-fit:cover;">
       </div>
       <input type="file" id="fileInput" accept="video/*,.mp4,.mov,.avi,.mkv,.webm,.wmv,.flv,.m4v" style="display:none;">
     </div>
@@ -1136,6 +1137,18 @@
       if (dropVideo) {
         dropVideo.src = objectUrl;
         dropVideo.style.display = 'block';
+        dropVideo.onloadeddata = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = 320;
+          canvas.height = 180;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(dropVideo, 0, 0, canvas.width, canvas.height);
+          const thumb = document.getElementById('videoThumb');
+          if (thumb) {
+            thumb.src = canvas.toDataURL('image/jpeg', 0.8);
+            thumb.style.display = 'block';
+          }
+        };
       }
       const dropContent = document.getElementById('dropzoneContent');
       if (dropContent) dropContent.style.display = 'none';
