@@ -491,7 +491,7 @@
     <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:500px;width:100%;padding:1.5rem;position:relative;">
       <button id="closeProfiles" style="position:absolute;top:0.6rem;right:0.6rem;background:rgba(0,0,0,0.4);border:none;color:white;font-size:1.6rem;width:40px;height:40px;border-radius:50%;cursor:pointer;z-index:10;">✕</button>
       <h2 style="margin-top:0;">Gérer les profils des réseaux sociaux</h2>
-      <p style="color:var(--muted);font-size:0.9rem;">Ajoute les noms de tes comptes pour chaque plateforme.</p>
+      <p style="color:var(--muted);font-size:0.9rem;">Enregistre tes identités (noms de comptes) pour chaque réseau. Ils seront proposés lors du partage.</p>
       <label style="display:block;margin:0.8rem 0 0.3rem;">Plateforme</label>
       <select id="profilePlatform" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;">
         <option value="TikTok">TikTok</option>
@@ -607,8 +607,12 @@
           <button type="button" class="btn" id="selectFileBtn" style="margin-top:0.8rem;">📁 Choisir dans mes fichiers</button>
           <p style="font-size: 0.85rem;margin-top:0.5rem;">Tous formats acceptés (MP4, MOV, AVI, MKV, WebM, etc.)</p>
         </div>
-        <video id="dropzoneVideo" controls style="display:none;width:100%;max-height:300px;border-radius:8px;"></video>
-        <img id="videoThumb" style="display:none;width:100%;max-height:200px;border-radius:8px;margin-top:0.5rem;object-fit:cover;">
+        <video id="dropzoneVideo" controls autoplay muted style="display:none;width:100%;max-height:350px;border-radius:8px;"></video>
+        <div id="thumbsContainer" style="display:none;margin-top:0.5rem;display:flex;gap:0.4rem;justify-content:center;">
+          <img id="thumb1" style="width:30%;border-radius:6px;cursor:pointer;" title="Début">
+          <img id="thumb2" style="width:30%;border-radius:6px;cursor:pointer;" title="Milieu">
+          <img id="thumb3" style="width:30%;border-radius:6px;cursor:pointer;" title="Fin">
+        </div>
       </div>
       <input type="file" id="fileInput" accept="video/*,.mp4,.mov,.avi,.mkv,.webm,.wmv,.flv,.m4v" style="display:none;">
     </div>
@@ -641,7 +645,10 @@
     </div>
   </div>
 
-  <footer>Application privée · Aucune donnée collectée · Fonctionne hors ligne</footer>
+  <footer>
+    Application privée · Aucune donnée collectée · Fonctionne hors ligne<br>
+    <a href="https://HeuusssIAKRi.com" target="_blank" style="color:var(--accent);text-decoration:underline;">🌐 HeuusssIAKRi.com</a>
+  </footer>
 
   <script>
     // Compte administrateur principal
@@ -1137,17 +1144,29 @@
       if (dropVideo) {
         dropVideo.src = objectUrl;
         dropVideo.style.display = 'block';
-        dropVideo.onloadeddata = () => {
-          const canvas = document.createElement('canvas');
-          canvas.width = 320;
-          canvas.height = 180;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(dropVideo, 0, 0, canvas.width, canvas.height);
-          const thumb = document.getElementById('videoThumb');
-          if (thumb) {
-            thumb.src = canvas.toDataURL('image/jpeg', 0.8);
-            thumb.style.display = 'block';
-          }
+        dropVideo.play().catch(() => {});
+        dropVideo.onloadedmetadata = () => {
+          const duration = dropVideo.duration;
+          const times = [0.5, duration / 2, duration - 0.5];
+          const thumbs = ['thumb1', 'thumb2', 'thumb3'];
+          const container = document.getElementById('thumbsContainer');
+          if (container) container.style.display = 'flex';
+          times.forEach((t, i) => {
+            const tempVideo = document.createElement('video');
+            tempVideo.src = objectUrl;
+            tempVideo.currentTime = Math.max(0, t);
+            tempVideo.onseeked = () => {
+              const canvas = document.createElement('canvas');
+              canvas.width = 320;
+              canvas.height = 180;
+              canvas.getContext('2d').drawImage(tempVideo, 0, 0, 320, 180);
+              const img = document.getElementById(thumbs[i]);
+              if (img) {
+                img.src = canvas.toDataURL('image/jpeg', 0.85);
+                img.onclick = () => { dropVideo.currentTime = t; dropVideo.play(); };
+              }
+            };
+          });
         };
       }
       const dropContent = document.getElementById('dropzoneContent');
@@ -1342,19 +1361,43 @@
         if (!currentFile) return alert('Charge d’abord une vidéo.');
         const baseName = currentFile.name.replace(/\.[^/.]+$/, '');
         const currentExt = (currentFile.name.split('.').pop() || 'mp4').toLowerCase();
-        const newTitle = prompt('Nouveau titre de la vidéo :', baseName);
-        if (newTitle === null) return;
-        const newFormat = prompt('Nouveau format (mp4, mov, webm, mkv, avi...) :', currentExt);
-        if (newFormat === null) return;
-        const finalName = (newTitle.trim() || baseName) + '.' + (newFormat.trim().toLowerCase() || currentExt);
-        const url = URL.createObjectURL(currentFile);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = finalName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        const modal = document.createElement('div');
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;';
+        modal.innerHTML = `
+          <div style="background:var(--card);border-radius:16px;padding:1.5rem;max-width:400px;width:100%;border:1px solid var(--border);">
+            <h3 style="margin-top:0;">Télécharger la vidéo</h3>
+            <label style="display:block;margin:0.5rem 0 0.2rem;font-size:0.85rem;">Titre</label>
+            <input type="text" id="dlTitle" value="${baseName}" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;">
+            <label style="display:block;margin:0.8rem 0 0.2rem;font-size:0.85rem;">Format</label>
+            <select id="dlFormat" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;">
+              <option value="mp4" ${currentExt==='mp4'?'selected':''}>MP4</option>
+              <option value="mov" ${currentExt==='mov'?'selected':''}>MOV</option>
+              <option value="webm" ${currentExt==='webm'?'selected':''}>WebM</option>
+              <option value="mkv" ${currentExt==='mkv'?'selected':''}>MKV</option>
+              <option value="avi" ${currentExt==='avi'?'selected':''}>AVI</option>
+            </select>
+            <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+              <button class="btn btn-secondary" id="cancelDl" style="flex:1;">Annuler</button>
+              <button class="btn" id="confirmDl" style="flex:1;">Télécharger</button>
+            </div>
+          </div>`;
+        document.body.appendChild(modal);
+        modal.querySelector('#cancelDl').onclick = () => modal.remove();
+        modal.querySelector('#confirmDl').onclick = () => {
+          const title = modal.querySelector('#dlTitle').value.trim() || baseName;
+          const format = modal.querySelector('#dlFormat').value;
+          const finalName = title + '.' + format;
+          const url = URL.createObjectURL(currentFile);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = finalName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          modal.remove();
+          status.innerHTML = `<span class="success">Téléchargement : ${finalName}</span>`;
+        };
       };
     }
 
@@ -1678,7 +1721,11 @@
           document.getElementById('profileName').value = '';
           loadProfilesList();
           updateProfileCount();
-          alert('Profil « ' + name + ' » ajouté pour ' + platform + ' (' + profiles[platform].length + '/20)');
+          const msg = document.createElement('div');
+          msg.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#22c55e;color:white;padding:0.8rem 1.5rem;border-radius:8px;z-index:600;';
+          msg.textContent = '✓ Profil « ' + name + ' » enregistré pour ' + platform;
+          document.body.appendChild(msg);
+          setTimeout(() => msg.remove(), 2000);
         });
       }
 
