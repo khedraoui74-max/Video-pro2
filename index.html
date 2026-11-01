@@ -1642,6 +1642,7 @@
       const logoutBtnTop = document.getElementById('logoutBtnTop');
       if (logoutBtnTop) {
         logoutBtnTop.addEventListener('click', () => {
+          if (!confirm('Tu veux vraiment te déconnecter ?')) return;
           const messages = [
             { text: "Au revoir ! Tes vidéos t'attendent demain... enfin, si elles n'ont pas fugué.", emoji: "👋" },
             { text: "Déconnexion réussie. Les plateformes sociales vont s'ennuyer.", emoji: "😴" },
