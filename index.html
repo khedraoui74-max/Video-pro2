@@ -437,7 +437,7 @@
       <option value="ar">العربية (فلسطينية)</option>
     </select>
     <button id="managePassword">Changer le mot de passe</button>
-    <button id="manageProfiles">Gérer les profils des réseaux sociaux</button>
+    <button id="searchBtn" style="margin-top:0.5rem;">🔍 Recherche</button>
     <button id="openAdminPanel" class="hidden">Panneau Administrateur</button>
     <button id="showHelp">Comment utiliser l’application</button>
     <button id="closeMenu" style="margin-top:2rem;background:var(--accent);">Fermer</button>
@@ -1463,7 +1463,28 @@
         });
       }
 
-      const openAdmin = document.getElementById('openAdminPanel');
+      const searchBtn = document.getElementById('searchBtn');
+      if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+          const query = prompt('Rechercher un réseau ou un profil :');
+          if (!query) return;
+          const q = query.toLowerCase();
+          const platforms = document.querySelectorAll('#platforms label');
+          let found = 0;
+          platforms.forEach(p => {
+            const text = p.textContent.toLowerCase();
+            if (text.includes(q)) {
+              p.style.background = 'var(--accent)';
+              p.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              found++;
+            } else {
+              p.style.background = '';
+            }
+          });
+          if (found === 0) alert('Aucun résultat pour « ' + query + ' »');
+          closeSidebar();
+        });
+      }
       if (openAdmin) {
         openAdmin.addEventListener('click', () => {
           const panel = document.getElementById('adminPanel');
