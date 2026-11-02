@@ -1165,7 +1165,25 @@
         <div class="info-item"><strong>Type</strong>${file.type || 'Inconnu'}</div>
         <div class="info-item"><strong>Format</strong>${file.name.split('.').pop().toUpperCase()}</div>
       `;
-      status.innerHTML = '<span class="success" style="font-size:1.05rem;font-weight:600;">✅ Vidéo chargée ! Sélectionne les réseaux ci-dessous.</span>';
+      status.innerHTML = '<div style="background:#22c55e;color:white;padding:1rem;border-radius:10px;margin-top:0.5rem;"><strong>✅ Vidéo prise en compte</strong><br>' + file.name + '<br><span style="font-size:0.85rem;">' + (file.size / 1024 / 1024).toFixed(1) + ' Mo</span></div>';
+      const popup = document.createElement('div');
+      popup.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#1a1a1f;border:3px solid #22c55e;color:white;padding:1.5rem;border-radius:16px;z-index:500;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.6);min-width:280px;max-width:90%;';
+      popup.innerHTML = '<div style="font-size:2rem;">✅</div><strong>Vidéo chargée</strong><br><img id="popupPhoto" style="width:100%;max-height:150px;border-radius:8px;margin:0.5rem 0;object-fit:cover;"><br><span style="color:#a0a0b0;">' + file.name + '</span><br><span style="color:#22c55e;">' + (file.size / 1024 / 1024).toFixed(1) + ' Mo</span><br><button class="btn" style="margin-top:0.8rem;" onclick="this.parentElement.remove()">OK</button>';
+      document.body.appendChild(popup);
+      const dropVideo = document.getElementById('dropzoneVideo');
+      if (dropVideo) {
+        dropVideo.onloadeddata = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = 320;
+          canvas.height = 180;
+          canvas.getContext('2d').drawImage(dropVideo, 0, 0, 320, 180);
+          const popupPhoto = document.getElementById('popupPhoto');
+          const videoPhoto = document.getElementById('videoPhoto');
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          if (popupPhoto) popupPhoto.src = dataUrl;
+          if (videoPhoto) { videoPhoto.src = dataUrl; videoPhoto.style.display = 'block'; }
+        };
+      }
       document.getElementById('mainDownloadBtn').style.display = 'inline-block';
       renderPlatforms();
       shareCard.scrollIntoView({ behavior: 'smooth' });
