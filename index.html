@@ -607,13 +607,14 @@
           <button type="button" class="btn" id="selectFileBtn" style="margin-top:0.8rem;">📁 Choisir dans mes fichiers</button>
           <p style="font-size: 0.85rem;margin-top:0.5rem;">Tous formats acceptés (MP4, MOV, AVI, MKV, WebM, etc.)</p>
         </div>
-        <video id="dropzoneVideo" controls style="display:none;width:100%;max-height:350px;border-radius:8px;"></video>
-        <img id="videoPhoto" style="display:none;width:100%;max-height:200px;border-radius:8px;margin-top:0.5rem;object-fit:cover;">
+        <video id="dropzoneVideo" controls style="display:none;width:100%;max-height:300px;border-radius:8px;margin-top:0.5rem;"></video>
+        <img id="videoPhoto" style="display:none;width:100%;max-height:180px;border-radius:8px;margin-top:0.5rem;object-fit:cover;border:2px solid var(--accent);">
       </div>
       <input type="file" id="fileInput" accept="video/*,.mp4,.mov,.avi,.mkv,.webm,.wmv,.flv,.m4v" style="display:none;">
     </div>
 
     <div class="card" id="previewCard" style="display: none;">
+      <h3>Aperçu de la vidéo</h3>
       <div class="info" id="videoInfo"></div>
       <div class="actions">
         <button class="btn" id="downloadBtn">Télécharger la vidéo</button>
@@ -627,7 +628,7 @@
       <h3>Partager sur les plateformes</h3>
       <p style="color: var(--muted); font-size: 0.9rem;">Charge une vidéo, coche les réseaux, puis choisis les profils (jusqu’à 20 par réseau).</p>
       <div class="platforms" id="platforms"></div>
-      <button class="btn" id="confirmShareBtn" style="margin-top:1rem;width:100%;">Continuer avec la sélection</button>
+      <button class="btn" id="confirmShareBtn" style="margin-top:1rem;width:100%;background:#22c55e;font-size:1.1rem;">📤 Envoyer aux réseaux</button>
     </div>
 
     <div class="card">
@@ -1172,7 +1173,11 @@
       document.body.appendChild(popup);
       document.getElementById('mainDownloadBtn').style.display = 'inline-block';
       renderPlatforms();
+      shareCard.style.display = 'block';
       shareCard.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => {
+        alert('Vidéo prête !\\n\\nCoche les réseaux ci-dessous puis clique sur « Continuer avec la sélection » pour envoyer.');
+      }, 500);
     }
 
     function renderPlatforms() {
