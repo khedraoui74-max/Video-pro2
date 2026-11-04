@@ -607,10 +607,11 @@
           <button type="button" class="btn" id="selectFileBtn" style="margin-top:0.8rem;">📁 Choisir dans mes fichiers</button>
           <p style="font-size: 0.85rem;margin-top:0.5rem;">Tous formats acceptés (MP4, MOV, AVI, MKV, WebM, etc.)</p>
         </div>
-        <div id="videoPreviewArea" style="margin-top:1rem;">
-          <img id="videoPhoto" style="display:none;width:100%;max-height:200px;border-radius:8px;object-fit:cover;border:3px solid #22c55e;">
-          <video id="dropzoneVideo" controls style="display:none;width:100%;max-height:280px;border-radius:8px;margin-top:0.5rem;background:#000;"></video>
-          <div id="videoStatus" style="display:none;background:#22c55e;color:white;padding:0.8rem;border-radius:8px;margin-top:0.5rem;text-align:center;"></div>
+        <div id="videoLoaded" style="display:none;text-align:center;">
+          <img id="videoPhoto" style="width:100%;max-height:200px;border-radius:8px;object-fit:cover;border:3px solid #22c55e;">
+          <video id="dropzoneVideo" controls style="width:100%;max-height:250px;border-radius:8px;margin-top:0.5rem;background:#000;"></video>
+          <div id="videoStatus" style="background:#22c55e;color:white;padding:0.8rem;border-radius:8px;margin-top:0.5rem;"></div>
+          <button class="btn btn-secondary" id="changeVideo" style="margin-top:0.5rem;">Changer de vidéo</button>
         </div>
       </div>
       <input type="file" id="fileInput" accept="video/*,.mp4,.mov,.avi,.mkv,.webm,.wmv,.flv,.m4v" style="display:none;">
@@ -1089,6 +1090,12 @@
       fileInput.value = '';
       fileInput.click();
     });
+    document.getElementById('changeVideo')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      fileInput.value = '';
+      fileInput.click();
+    });
     // Afficher les plateformes dès le départ
     // (appelé après la définition de renderPlatforms)
     dropzone.addEventListener('click', (e) => {
@@ -1163,7 +1170,9 @@
         };
       }
       const dropContent = document.getElementById('dropzoneContent');
+      const videoLoaded = document.getElementById('videoLoaded');
       if (dropContent) dropContent.style.display = 'none';
+      if (videoLoaded) videoLoaded.style.display = 'block';
       previewCard.style.display = 'block';
       shareCard.style.display = 'block';
 
