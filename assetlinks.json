@@ -1,8 +1,0 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "app.vercel.videopro2.twa",
-        "sha256_cert_fingerprints": ["52:40:C3:10:38:2A:5B:9F:9D:26:F9:88:DC:34:5A:93:AC:FD:6C:4A:0F:62:A3:21:78:48:3E:6B:EA:19:CB:16"]
-      }
-    }]
