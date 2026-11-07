@@ -746,9 +746,9 @@
     if (remembered && document.getElementById('loginScreen') && !document.getElementById('loginScreen').classList.contains('hidden')) {
       try {
         const data = JSON.parse(remembered);
-        if (data.pass) {
+        if (data.email) {
           document.getElementById('loginEmail').value = data.email || '';
-          document.getElementById('loginPassword').value = data.pass;
+          if (data.pass) document.getElementById('loginPassword').value = data.pass;
           document.getElementById('rememberMe').checked = true;
         }
       } catch {}
@@ -786,7 +786,8 @@
 
       // Admin uniquement avec l'email exact
       if (email === ADMIN_EMAIL && checkAdmin(pass)) {
-        if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
+        if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email }));
+        localStorage.setItem('videoprivee_session', JSON.stringify({ email, isAdmin: true }));
         unlockApp(true);
         return;
       }
@@ -798,8 +799,9 @@
           loginError.textContent = 'Ce compte est suspendu.';
           return;
         }
-        if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email, pass }));
-        unlockApp(email === ADMIN_EMAIL);
+        if (remember) localStorage.setItem('videoprivee_remember', JSON.stringify({ email }));
+        localStorage.setItem('videoprivee_session', JSON.stringify({ email, isAdmin: false }));
+        unlockApp(false);
         return;
       }
       if (email === ADMIN_EMAIL && !checkAdmin(pass)) {
@@ -808,6 +810,28 @@
       }
       loginError.textContent = 'E-mail ou mot de passe incorrect';
     };
+
+    function restoreSession() {
+      const raw = localStorage.getItem('videoprivee_session');
+      if (!raw || !loginScreen || loginScreen.classList.contains('hidden')) return;
+      try {
+        const data = JSON.parse(raw);
+        const email = (data.email || '').trim().toLowerCase();
+        if (!email) return;
+        const suspended = getSuspended();
+        const accounts = getAccounts();
+        const isAdmin = email === ADMIN_EMAIL;
+        if (suspended.includes(email) || (!isAdmin && !accounts[email])) {
+          localStorage.removeItem('videoprivee_session');
+          return;
+        }
+        document.getElementById('loginEmail').value = email;
+        unlockApp(isAdmin);
+      } catch {
+        localStorage.removeItem('videoprivee_session');
+      }
+    }
+    restoreSession();
 
     // Inscription
     document.getElementById('registerBtn').onclick = () => {
@@ -1832,6 +1856,7 @@
             document.getElementById('logoutBtnTop').classList.add('hidden');
             document.getElementById('loginPassword').value = '';
             document.getElementById('loginEmail').value = '';
+            localStorage.removeItem('videoprivee_session');
             closeSidebar();
           };
         });
