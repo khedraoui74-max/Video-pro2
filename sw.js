@@ -1,4 +1,4 @@
-const CACHE_NAME = 'videoprivee-v4';
+const CACHE_NAME = 'videoprivee-v5';
 
 self.addEventListener('install', (e) => {
   e.waitUntil(

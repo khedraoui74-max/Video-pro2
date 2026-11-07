@@ -629,6 +629,18 @@
       <div class="status" id="status"></div>
     </div>
 
+    <div class="card" id="igCard">
+      <h3>Texte Instagram</h3>
+      <p style="color: var(--muted); font-size: 0.9rem;">Aide locale, inspirée de <a href="https://github.com/Jakeschincariol/instagram-agent-skill" target="_blank" rel="noopener" style="color:var(--accent);">instagram-agent-skill</a> (MIT). Rien n’est publié : tu copies le texte, puis tu l’envoies toi-même.</p>
+      <label style="display:block;margin:0.6rem 0 0.3rem;font-size:0.85rem;">Légende</label>
+      <textarea id="igCaption" rows="5" placeholder="Écris la légende, ou propose 3 accroches." style="width:100%;padding:0.8rem;border-radius:8px;border:1px solid var(--border);background:#121216;color:white;font-family:inherit;"></textarea>
+      <div id="igPreview" style="margin-top:0.6rem;font-size:0.85rem;color:var(--muted);line-height:1.5;"></div>
+      <div class="actions" style="margin-top:0.6rem;">
+        <button class="btn" id="igHooksBtn" type="button">3 accroches</button>
+        <button class="btn btn-secondary" id="igCopyBtn" type="button">Copier le texte</button>
+      </div>
+    </div>
+
     <div class="card" id="shareCard">
       <h3>Partager sur les plateformes</h3>
       <p style="color: var(--muted); font-size: 0.9rem;">Charge une vidéo, coche les réseaux, puis choisis les profils (jusqu’à 20 par réseau).</p>
@@ -1228,10 +1240,58 @@
     }
     renderPlatforms();
 
+    function igTopic() {
+      if (!currentFile) return 'cette vidéo';
+      return currentFile.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
+    }
+    function igHashtags(text) {
+      return (text.match(/#[\p{L}\p{N}_]+/gu) || []);
+    }
+    function refreshIgPreview() {
+      const box = document.getElementById('igPreview');
+      const text = document.getElementById('igCaption').value || '';
+      const visible = text.slice(0, 125);
+      const tags = igHashtags(text);
+      const cut = text.length > 125;
+      let note = '';
+      if (/^stop scrolling/i.test(text.trim())) note = '<br><span style="color:#f87171">Accroche faible : ne commence pas par « stop scrolling ».</span>';
+      if (tags.length > 5) note += '<br><span style="color:#fbbf24">Instagram n’affiche bien que 5 hashtags. Tu en as ' + tags.length + '.</span>';
+      box.innerHTML = '<strong>Avant « … plus » (' + Math.min(text.length, 125) + '/125)</strong><br>' +
+        (visible ? visible.replace(/</g, '<') : '—') +
+        (cut ? '…' : '') + note;
+    }
+    function suggestIgHooks() {
+      const t = igTopic();
+      const hooks = [
+        'Personne ne te dit ça sur ' + t + '.',
+        'Si tu fais ' + t + ', ces 20 secondes règlent le problème.',
+        'J’ai testé ' + t + '. Voici ce qui a vraiment changé.'
+      ];
+      document.getElementById('igCaption').value = hooks.map((h, i) => (i + 1) + '. ' + h).join('\n\n') + '\n\n#reels';
+      refreshIgPreview();
+    }
+    document.getElementById('igCaption').addEventListener('input', refreshIgPreview);
+    document.getElementById('igHooksBtn').onclick = suggestIgHooks;
+    document.getElementById('igCopyBtn').onclick = async () => {
+      const text = document.getElementById('igCaption').value.trim();
+      if (!text) return alert('Écris d’abord la légende.');
+      try {
+        await navigator.clipboard.writeText(text);
+        document.getElementById('igPreview').insertAdjacentHTML('beforeend', '<br><span style="color:#22c55e">Texte copié.</span>');
+      } catch {
+        alert(text);
+      }
+    };
+    refreshIgPreview();
+
     document.getElementById('confirmShareBtn').onclick = async () => {
       if (!currentFile) return alert('Charge d’abord une vidéo.');
       const selected = Array.from(platformsDiv.querySelectorAll('input:checked')).map(cb => cb.value);
       if (selected.length === 0) return alert('Sélectionne au moins un réseau.');
+      if (selected.indexOf('Instagram') !== -1) {
+        const igText = (document.getElementById('igCaption').value || '').trim();
+        if (igText) { try { await navigator.clipboard.writeText(igText); } catch {} }
+      }
 
       const allProfiles = getProfiles();
       const choices = {};
